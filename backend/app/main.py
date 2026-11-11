@@ -9,6 +9,7 @@ from app.budget.router import router as budget_router
 from app.catalog.router import router as catalog_router
 from app.projects.router import router as projects_router
 from app.works.router import router as works_router
+from app.services_pakn.router import router as services_router
 from app.files.router import router as files_router
 from app.indicators.router import router as indicators_router
 from app.indicators.workflow import router as workflow_router
@@ -40,4 +41,5 @@ def create_app() -> FastAPI:
     app.include_router(budget_router)
     app.include_router(projects_router)
     app.include_router(works_router)
+    app.include_router(services_router)
     return app

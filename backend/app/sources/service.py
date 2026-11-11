@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.platform.models import Tenant
 from app.sources import builtin  # noqa: F401  (đăng ký connector dựng sẵn)
+from app.services_pakn import service as _pakn  # noqa: F401  (đăng ký sink 'pakn')
 from app.sources.builtin import KHO_DL_DAN_CU_ENDPOINTS
 from app.sources.models import DataSource, SyncRun
 from app.sources.registry import CONNECTORS, PII_KEYS, SINKS
