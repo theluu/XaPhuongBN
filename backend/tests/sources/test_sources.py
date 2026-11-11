@@ -95,3 +95,15 @@ async def test_module_status_dang_ket_noi():
     assert st["cong_trinh"] == "dang_ket_noi"
     assert st["gd_yt_mt"] == "tat"
     assert st["ngan_sach"] == "dang_ket_noi"  # chưa có nguồn nào
+
+
+async def test_module_on_when_confirmed_manual_data_exists():
+    from tests.indicators.helpers import add_value, make_indicator
+
+    t = await make_tenant()
+    iid = await make_indicator(t, nhom="gd_yt_mt", phan_he="gd_yt_mt")
+    async with admin_sessionmaker()() as s:
+        assert (await module_status(s, t))["gd_yt_mt"] == "dang_ket_noi"
+    await add_value(t, iid, "2026-10", 5)
+    async with admin_sessionmaker()() as s:
+        assert (await module_status(s, t))["gd_yt_mt"] == "bat"

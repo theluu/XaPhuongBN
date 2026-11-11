@@ -71,6 +71,13 @@ describe("KpiTile", () => {
   });
 });
 
+describe("Mục tiêu dạng khoảng", () => {
+  it("hiển thị đủ cận dưới và cận trên", () => {
+    render(<KpiTile card={card({ chieu: "dat_nguong", ke_hoach: null, muc_tieu_khoang: [3, 4], muc_so_sanh: 3 })} />);
+    expect(screen.getByText("Mục tiêu 3–4")).toBeInTheDocument();
+  });
+});
+
 describe("ProvenanceStamp", () => {
   it("đã xác nhận: dấu đặc", () => {
     render(<ProvenanceStamp card={card()} />);

@@ -6,6 +6,7 @@ import { StatusBadge } from "./StatusBadge";
 
 function targetText(c: IndicatorCard): string | null {
   if (c.chieu === "theo_doi") return null;
+  if (c.ke_hoach === null && c.muc_tieu_khoang) return `Mục tiêu ${formatNumber(c.muc_tieu_khoang[0])}–${formatNumber(c.muc_tieu_khoang[1])}`;
   if (c.muc_so_sanh !== null) {
     const op = c.chieu === "giam_tot" ? "≤" : c.nguong_toan_tu === ">" ? ">" : "≥";
     return `${c.ke_hoach !== null ? "Kế hoạch" : "Mục tiêu"} ${op} ${formatNumber(c.muc_so_sanh)}`;

@@ -101,11 +101,18 @@ async def module_status(s: AsyncSession, tenant_id: int) -> dict[str, str]:
     srcs = list((await s.execute(
         select(DataSource).where((DataSource.tenant_id == tenant_id) | (DataSource.tenant_id.is_(None)))
     )).scalars())
+    from app.catalog.models import Indicator
+    from app.indicators.models import IndicatorValue
+
+    manual = set((await s.execute(
+        select(Indicator.phan_he).join(IndicatorValue, IndicatorValue.indicator_id == Indicator.id)
+        .where(IndicatorValue.tenant_id == tenant_id, IndicatorValue.trang_thai == "da_xac_nhan").distinct()
+    )).scalars())
     out: dict[str, str] = {}
     for ph in PHAN_HE:
         if (tenant.modules or {}).get(ph) == "tat":
             out[ph] = "tat"
-        elif any(x.nhom_du_lieu == ph and x.trang_thai in ACTIVE for x in srcs):
+        elif ph in manual or any(x.nhom_du_lieu == ph and x.trang_thai in ACTIVE for x in srcs):
             out[ph] = "bat"
         else:
             out[ph] = "dang_ket_noi"
