@@ -176,3 +176,19 @@ async def test_user_import_then_approve(client):
     r = await client.post("/api/auth/login", json={"username": name, "password": temp})
     assert r.status_code == 200
     assert r.json()["user"]["phai_doi_mat_khau"] is True
+
+
+async def test_change_password_policy_and_flag(client):
+    t = await make_tenant()
+    u = await make_user(t)
+    tok = await login(client, u["username"])
+    h = bearer(tok)
+    r = await client.post("/api/auth/change-password", json={"mat_khau_cu": "sai", "mat_khau_moi": "Abcdef@12345"}, headers=h)
+    assert r.status_code == 400 and r.json()["detail"] == "Mật khẩu hiện tại không đúng"
+    r = await client.post("/api/auth/change-password", json={"mat_khau_cu": PASSWORD, "mat_khau_moi": "ngan"}, headers=h)
+    assert r.status_code == 422 and "ít nhất 10 ký tự" in r.json()["detail"]
+    r = await client.post("/api/auth/change-password", json={"mat_khau_cu": PASSWORD, "mat_khau_moi": "Mat-khau-moi@2026"}, headers=h)
+    assert r.status_code == 200
+    assert (await client.get("/api/auth/me", headers=h)).status_code == 401  # phiên cũ hết hiệu lực
+    r = await client.post("/api/auth/login", json={"username": u["username"], "password": "Mat-khau-moi@2026"})
+    assert r.status_code == 200 and r.json()["user"]["phai_doi_mat_khau"] is False

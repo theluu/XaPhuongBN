@@ -186,3 +186,35 @@ async def import_users(file: UploadFile = File(...), actor: CurrentUser = Depend
         await s.commit()
     await record_change(actor, actor.tenant_id, "nguoi_dung:import", None, {"tao_moi": [c["username"] for c in created]})
     return {"tao_moi": created}
+
+
+class ChangePwIn(BaseModel):
+    mat_khau_cu: str
+    mat_khau_moi: str
+
+
+def password_problem(pw: str) -> str | None:
+    if len(pw) < 10:
+        return "Mật khẩu mới phải có ít nhất 10 ký tự, gồm chữ hoa, chữ thường, chữ số và ký tự đặc biệt"
+    checks = [any(c.isupper() for c in pw), any(c.islower() for c in pw), any(c.isdigit() for c in pw), any(not c.isalnum() for c in pw)]
+    if not all(checks):
+        return "Mật khẩu mới phải có ít nhất 10 ký tự, gồm chữ hoa, chữ thường, chữ số và ký tự đặc biệt"
+    return None
+
+
+@router.post("/auth/change-password")
+async def change_password(body: ChangePwIn, user: CurrentUser = Depends(get_current_user)) -> dict:
+    async with admin_sessionmaker()() as s:
+        u = await s.get(User, user.id)
+        if not verify_password(body.mat_khau_cu, u.password_hash):
+            raise HTTPException(400, "Mật khẩu hiện tại không đúng")
+        if (p := password_problem(body.mat_khau_moi)) is not None:
+            raise HTTPException(422, p)
+        if body.mat_khau_moi == body.mat_khau_cu:
+            raise HTTPException(422, "Mật khẩu mới phải khác mật khẩu hiện tại")
+        u.password_hash = hash_password(body.mat_khau_moi)
+        u.phai_doi_mat_khau = False
+        u.token_version += 1
+        await s.commit()
+    await record_change(user, user.tenant_id, f"nguoi_dung:{user.id}:doi_mat_khau", None, {"doi_mat_khau": True})
+    return {"ok": True, "ghi_chu": "Đăng nhập lại bằng mật khẩu mới"}

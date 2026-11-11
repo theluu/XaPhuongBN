@@ -4,6 +4,7 @@ import { BellRing, Building2, ClipboardCheck, Database, Gauge, GraduationCap, Ha
 import { useAuth } from "@/lib/auth";
 import { api } from "@/lib/api";
 import { GovHeader } from "./GovHeader";
+import { ChangePasswordDialog } from "@/features/auth/ChangePasswordDialog";
 import { Footer } from "./Footer";
 import { PeriodFilter } from "./PeriodFilter";
 import { SampleBanner } from "./SampleBanner";
@@ -30,7 +31,10 @@ export function AppShell() {
   const sample = useQuery({ queryKey: ["sample-flag"], queryFn: () => api<{ co_du_lieu_minh_hoa: boolean }>("/api/sample-flag") });
   if (!tenant || !me) return null;
   const canNhap = Object.values(me.quyen).some((q) => q.includes("nhap") || q.includes("duyet"));
-  const items = NAV.filter((n) => (n.needs ? canNhap : !n.nhom || can("doc", n.nhom)));
+  const platformAdmin = me.roles.includes("quan_tri_nen_tang");
+  const items = platformAdmin
+    ? NAV.filter((n) => n.to === "/quan-tri" || n.to === "/nguon-du-lieu")
+    : NAV.filter((n) => (n.needs ? canNhap : !n.nhom || can("doc", n.nhom)));
   return (
     <div className="flex min-h-screen flex-col">
       <SampleBanner show={!!sample.data?.co_du_lieu_minh_hoa} />
@@ -68,6 +72,7 @@ export function AppShell() {
         </main>
       </div>
       <Footer />
+      <ChangePasswordDialog />
     </div>
   );
 }

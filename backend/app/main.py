@@ -20,6 +20,7 @@ from app.ingestion.router import router as ingestion_router
 from app.compliance.router import router as compliance_router
 from app.overview.router import router as overview_router
 from app.reports.router import router as reports_router
+from app.platform.admin import admin as unit_admin_router, platform as platform_router_admin
 from app.alerts import scheduler as alert_scheduler
 from app.files.router import router as files_router
 from app.indicators.router import router as indicators_router
@@ -69,4 +70,6 @@ def create_app() -> FastAPI:
     app.include_router(compliance_router)
     app.include_router(overview_router)
     app.include_router(reports_router)
+    app.include_router(platform_router_admin)
+    app.include_router(unit_admin_router)
     return app

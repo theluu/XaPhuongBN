@@ -18,6 +18,8 @@ import { QualityOfLifePage } from "@/features/quality-of-life/QualityOfLifePage"
 import { AlertsBoard } from "@/features/alerts/AlertsBoard";
 import { DataEntryPage } from "@/features/data-entry/DataEntryPage";
 import { PresentationMode } from "@/features/presentation/PresentationMode";
+import { AdminPage } from "@/features/platform-admin/AdminPage";
+import { SourcesPage } from "@/features/sources/SourcesPage";
 import { ProgramsPage } from "@/features/nq01/ProgramsPage";
 import { ScenariosPage } from "@/features/nq01/ScenariosPage";
 
@@ -54,6 +56,8 @@ export default function App() {
                 <Route path="chat-luong-song" element={<QualityOfLifePage />} />
                 <Route path="canh-bao" element={<AlertsBoard />} />
                 <Route path="nhap-lieu" element={<DataEntryPage />} />
+                <Route path="quan-tri" element={<AdminPage />} />
+                <Route path="nguon-du-lieu" element={<SourcesPage />} />
                 <Route path="*" element={<Pending title="Phân hệ" />} />
               </Route>
             </Routes>
