@@ -3,6 +3,9 @@ và ~80 phản ánh kiến nghị (một số gần hạn/quá hạn)."""
 import hashlib
 from datetime import date, timedelta
 
+from sqlalchemy import select
+
+from app.platform.models import ResidentialGroup
 from app.services_pakn.models import AdminServiceStat
 from app.services_pakn.service import pakn_sink
 
@@ -28,6 +31,7 @@ async def seed(s, tenant_id: int, users: dict) -> None:  # noqa: ANN001
             s.add(AdminServiceStat(tenant_id=tenant_id, ngay=d, bo_phan=bp, linh_vuc=lv, tiep_nhan=tn, giai_quyet=gq, dung_han=gq - qh,
                                    qua_han=qh, truc_tuyen=int(tn * (0.55 + (r % 20) / 100)), nguon="bieu_mau",
                                    trang_thai="tam_thoi" if i <= 7 else "da_xac_nhan", nguoi_nhap_id=users.get("canbo1"), is_sample=True))
+    tdps = [g.id for g in (await s.execute(select(ResidentialGroup).where(ResidentialGroup.tenant_id == tenant_id).order_by(ResidentialGroup.ma_tdp))).scalars()]
     recs = []
     for i in range(80):
         r = _r("pakn", i)
@@ -37,5 +41,5 @@ async def seed(s, tenant_id: int, users: dict) -> None:  # noqa: ANN001
         recs.append({"ma": f"PAKN-2026-{1000 + i}", "loai_viec": LOAI[r % 5], "linh_vuc": LOAI[r % 5], "ngay_nhan": nhan.isoformat(),
                      "trang_thai": tt, "trang_thai_tra_loi": "da_tra_loi" if tt == "hoan_thanh" else "chua_tra_loi",
                      "danh_gia_hai_long": (3 + r % 3) if tt == "hoan_thanh" and r % 3 else None,
-                     "ngay_hoan_thanh": (nhan + timedelta(days=2 + r % 6)).isoformat() if tt == "hoan_thanh" else None, "is_sample": True})
+                     "tdp_id": tdps[(i * 5) % len(tdps)] if tdps and i % 7 else None, "ngay_hoan_thanh": (nhan + timedelta(days=2 + r % 6)).isoformat() if tt == "hoan_thanh" else None, "is_sample": True})
     await pakn_sink(s, tenant_id, recs)
