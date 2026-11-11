@@ -17,16 +17,17 @@ import { ServicesPage } from "@/features/services/ServicesPage";
 import { QualityOfLifePage } from "@/features/quality-of-life/QualityOfLifePage";
 import { AlertsBoard } from "@/features/alerts/AlertsBoard";
 import { DataEntryPage } from "@/features/data-entry/DataEntryPage";
+import { PresentationMode } from "@/features/presentation/PresentationMode";
 import { ProgramsPage } from "@/features/nq01/ProgramsPage";
 import { ScenariosPage } from "@/features/nq01/ScenariosPage";
 
 const qc = new QueryClient({ defaultOptions: { queries: { staleTime: 60_000, refetchOnWindowFocus: false } } });
 
-function Guard() {
+function Guard({ bare = false }: { bare?: boolean }) {
   const { me, loading } = useAuth();
   if (loading) return <div className="p-8 text-muc-nhat">Đang tải…</div>;
   if (!me) return <Navigate to="/dang-nhap" replace />;
-  return <AppShell />;
+  return bare ? <PresentationMode /> : <AppShell />;
 }
 
 export default function App() {
@@ -37,6 +38,7 @@ export default function App() {
           <BrowserRouter>
             <Routes>
               <Route path="/dang-nhap" element={<LoginPage />} />
+              <Route path="/trinh-chieu" element={<Guard bare />} />
               <Route element={<Guard />}>
                 <Route index element={<OverviewPage />} />
                 <Route path="chi-tieu" element={<Nq01Page />} />
