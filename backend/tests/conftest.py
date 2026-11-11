@@ -1,0 +1,38 @@
+import os
+
+import pytest_asyncio
+from httpx import ASGITransport, AsyncClient
+from sqlalchemy import text
+from sqlalchemy.ext.asyncio import create_async_engine
+
+TEST_DB = "ioc_test"
+
+
+def _admin_url() -> str:
+    url = os.environ["DATABASE_URL"]
+    return url.rsplit("/", 1)[0] + "/postgres"
+
+
+@pytest_asyncio.fixture(scope="session", autouse=True, loop_scope="session")
+async def _test_database():
+    admin = create_async_engine(_admin_url(), isolation_level="AUTOCOMMIT")
+    async with admin.connect() as c:
+        await c.execute(text(f'DROP DATABASE IF EXISTS "{TEST_DB}" WITH (FORCE)'))
+        await c.execute(text(f'CREATE DATABASE "{TEST_DB}"'))
+    await admin.dispose()
+    os.environ["DATABASE_URL"] = os.environ["DATABASE_URL"].rsplit("/", 1)[0] + f"/{TEST_DB}"
+    from app.core import db
+
+    db.reset_engine()
+    await db.init_test_schema()
+    yield
+    await db.dispose_engine()
+
+
+@pytest_asyncio.fixture(loop_scope="session")
+async def client():
+    from app.main import create_app
+
+    app = create_app()
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as c:
+        yield c
