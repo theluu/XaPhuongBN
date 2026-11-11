@@ -7,7 +7,7 @@ tenant:
   config:
     ten_co_quan: ["ĐẢNG ỦY – UBND PHƯỜNG VIỆT YÊN", "Hệ thống điều hành số phường"]
     tinh: Bắc Ninh
-    ban_do: {tam: [21.2725, 106.0975], zoom: 14}
+    ban_do: {tam: [21.2725, 106.0975], zoom: 14, bbox: [21.250, 106.070, 21.295, 106.130]}
     cho_phep_theo_tdp: true
     logo: null
   modules: {ktxh: bat, dan_cu: bat, ngan_sach: bat, dau_tu_cong: bat, cong_trinh: bat, tthc_pakn: bat, gd_yt_mt: bat}
