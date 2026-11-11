@@ -4,4 +4,4 @@ services:
   backend:
     ports: ["127.0.0.1:8090:8090"]
     volumes: ["./backend:/srv", "filestore:/data/storage"]
-    command: ["uvicorn", "app.main:create_app", "--factory", "--host", "0.0.0.0", "--port", "8090", "--reload"]
+    command: ["./start.sh", "--reload"]

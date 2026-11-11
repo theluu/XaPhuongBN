@@ -8,23 +8,24 @@ from sqlalchemy.ext.asyncio import create_async_engine
 TEST_DB = "ioc_test"
 
 
-def _admin_url() -> str:
-    url = os.environ["DATABASE_URL"]
-    return url.rsplit("/", 1)[0] + "/postgres"
+def _with_db(url: str, db: str) -> str:
+    return url.rsplit("/", 1)[0] + f"/{db}"
 
 
 @pytest_asyncio.fixture(scope="session", autouse=True, loop_scope="session")
 async def _test_database():
-    admin = create_async_engine(_admin_url(), isolation_level="AUTOCOMMIT")
+    admin = create_async_engine(_with_db(os.environ["ADMIN_DATABASE_URL"], "postgres"), isolation_level="AUTOCOMMIT")
     async with admin.connect() as c:
         await c.execute(text(f'DROP DATABASE IF EXISTS "{TEST_DB}" WITH (FORCE)'))
         await c.execute(text(f'CREATE DATABASE "{TEST_DB}"'))
     await admin.dispose()
-    os.environ["DATABASE_URL"] = os.environ["DATABASE_URL"].rsplit("/", 1)[0] + f"/{TEST_DB}"
+    os.environ["ADMIN_DATABASE_URL"] = _with_db(os.environ["ADMIN_DATABASE_URL"], TEST_DB)
+    os.environ["DATABASE_URL"] = _with_db(os.environ["DATABASE_URL"], TEST_DB)
     from app.core import db
+    from app.core.bootstrap import bootstrap
 
     db.reset_engine()
-    await db.init_test_schema()
+    await bootstrap()
     yield
     await db.dispose_engine()
 

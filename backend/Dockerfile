@@ -7,4 +7,4 @@ COPY . .
 RUN useradd -r -u 10001 appuser && mkdir -p /data/storage && chown -R appuser /srv /data/storage
 USER appuser
 EXPOSE 8090
-CMD ["uvicorn", "app.main:create_app", "--factory", "--host", "0.0.0.0", "--port", "8090", "--workers", "2", "--proxy-headers"]
+CMD ["./start.sh", "--workers", "2"]
