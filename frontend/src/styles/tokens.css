@@ -1,0 +1,31 @@
+/* Hệ màu "Con dấu xác nhận" — xem docs/superpowers/plans (Thiết kế giao diện) */
+:root {
+  --nen: #eef2f3;          /* giấy can bản đồ */
+  --be-mat: #ffffff;
+  --be-mat-2: #f6f8f9;
+  --muc: #16324a;          /* mực xanh công văn */
+  --muc-nhat: #4a6175;
+  --vien: rgba(22, 50, 74, 0.14);
+  --xac-nhan: #1e7358;
+  --tam-thoi: #b7791f;
+  --son: #b42318;          /* đỏ son — chỉ cho việc cần chỉ đạo & quá hạn */
+  --thieu: #8796a3;
+  --co-do: #da251d;
+  --co-vang: #ffcd00;
+  --focus: #1d5fa8;
+  color-scheme: light;
+}
+[data-theme="dark"] {
+  --nen: #0f2436;          /* xanh đêm bản đồ */
+  --be-mat: #16324a;
+  --be-mat-2: #1b3a55;
+  --muc: #e6edf2;
+  --muc-nhat: #a9bccb;
+  --vien: rgba(230, 237, 242, 0.16);
+  --xac-nhan: #3fa37f;
+  --tam-thoi: #d9a43f;
+  --son: #e0533f;
+  --thieu: #6e8496;
+  --focus: #7db4ee;
+  color-scheme: dark;
+}

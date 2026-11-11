@@ -1,3 +1,38 @@
+@import "@fontsource/be-vietnam-pro/400.css";
+@import "@fontsource/be-vietnam-pro/500.css";
+@import "@fontsource/be-vietnam-pro/600.css";
+@import "@fontsource/be-vietnam-pro/700.css";
+@import "@fontsource/barlow-semi-condensed/500.css";
+@import "@fontsource/barlow-semi-condensed/600.css";
+@import "./tokens.css";
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  html { font-size: 16px; }
+  body {
+    @apply bg-nen text-muc font-sans antialiased;
+    font-feature-settings: "tnum" 1;
+  }
+  :focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; border-radius: 4px; }
+  h1, h2, h3 { text-wrap: balance; }
+}
+
+@layer components {
+  .tabular { font-variant-numeric: tabular-nums; }
+  .khu { @apply bg-be-mat border border-vien; }
+  /* Vân gạch chéo = chưa có số liệu (không bao giờ là 0) */
+  .is-missing {
+    background-image: repeating-linear-gradient(135deg, transparent 0 6px, color-mix(in srgb, var(--thieu) 22%, transparent) 6px 7px);
+  }
+  .nhan { @apply text-[13px] text-muc-nhat; }
+  .btn { @apply inline-flex items-center gap-2 rounded-md px-3.5 py-2 text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed; }
+  .btn-chinh { @apply btn bg-muc text-be-mat hover:opacity-90; }
+  .btn-phu { @apply btn border border-vien bg-be-mat hover:bg-be-mat-2; }
+  .o-nhap { @apply w-full rounded-md border border-vien bg-be-mat px-3 py-2 text-[15px] placeholder:text-muc-nhat; }
+}
+
+@keyframes dong-dau { from { transform: scale(1.18); opacity: 0.4; } to { transform: scale(1); opacity: 1; } }
+.dong-dau { animation: dong-dau 180ms ease-out; }
+@media (prefers-reduced-motion: reduce) { .dong-dau { animation: none; } }

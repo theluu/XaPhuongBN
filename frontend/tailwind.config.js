@@ -7,6 +7,7 @@ export default {
       colors: {
         nen: "var(--nen)",
         "be-mat": "var(--be-mat)",
+        "be-mat-2": "var(--be-mat-2)",
         muc: "var(--muc)",
         "muc-nhat": "var(--muc-nhat)",
         vien: "var(--vien)",

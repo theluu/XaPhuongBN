@@ -8,6 +8,7 @@ from app.core.db import get_session
 from app.files.router import router as files_router
 from app.indicators.router import router as indicators_router
 from app.indicators.workflow import router as workflow_router
+from app.platform.router import router as platform_router
 from app.sources.router import router as sources_router
 
 
@@ -26,6 +27,7 @@ def create_app() -> FastAPI:
         return {"status": "ok", "db": "ok"}
 
     app.include_router(auth_router)
+    app.include_router(platform_router)
     app.include_router(sources_router)
     app.include_router(workflow_router)
     app.include_router(indicators_router)
