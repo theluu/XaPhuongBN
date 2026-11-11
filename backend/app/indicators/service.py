@@ -41,7 +41,8 @@ def effective(req: Period, loai: str) -> Period:
 
 async def _rows(s: AsyncSession, indicator_id: int, ky: str, scope: str | None = None) -> list[IndicatorValue]:
     q = select(IndicatorValue).where(
-        IndicatorValue.indicator_id == indicator_id, IndicatorValue.ky_bao_cao == ky, IndicatorValue.tdp_id.is_(None)
+        IndicatorValue.indicator_id == indicator_id, IndicatorValue.ky_bao_cao == ky, IndicatorValue.tdp_id.is_(None),
+        IndicatorValue.dvhc_cu.is_(None),
     )
     if scope:
         q = q.where(IndicatorValue.scope == scope)
@@ -95,9 +96,27 @@ async def plan_for(s: AsyncSession, indicator_id: int, ky: str, luy_ke: bool = T
     return (await s.execute(q.where(IndicatorPlan.ky == ky[:4]))).scalar()
 
 
-async def _simple(s: AsyncSession, ind: Indicator, ky: str) -> float | None:
+def additive(ind: Indicator) -> bool:
+    """Chỉ số cộng được giữa các đơn vị (số hộ, số người, số tiền…). Tỷ lệ, bình quân thì không."""
+    u = (ind.don_vi_do or "").lower()
+    return not any(x in u for x in ("%", "/", "bình quân", "có/không"))
+
+
+async def _simple(s: AsyncSession, ind: Indicator, ky: str) -> dict:
     v, _, _ = _resolve(ind, await _rows(s, ind.id, ky, ind.scope))
-    return num(v.gia_tri) if v else None
+    if v is not None:
+        return {"ky": ky, "gia_tri": num(v.gia_tri)}
+    old = list((await s.execute(select(IndicatorValue).where(
+        IndicatorValue.indicator_id == ind.id, IndicatorValue.ky_bao_cao == ky, IndicatorValue.dvhc_cu.is_not(None),
+        IndicatorValue.trang_thai == "da_xac_nhan"))).scalars())
+    if not old:
+        return {"ky": ky, "gia_tri": None}
+    if not additive(ind) or any(o.gia_tri is None for o in old):
+        return {"ky": ky, "gia_tri": None, "gop_tu": sorted({o.dvhc_cu for o in old}), "ghi_chu": "Số các đơn vị trước sắp xếp không cộng gộp được"}
+    by: dict[str, IndicatorValue] = {}
+    for o in sorted(old, key=lambda o: -o.version):
+        by.setdefault(o.dvhc_cu, o)
+    return {"ky": ky, "gia_tri": num(sum((o.gia_tri for o in by.values()), Decimal(0))), "gop_tu": sorted(by)}
 
 
 async def card(s: AsyncSession, ind: Indicator, ky_req: str) -> dict:
@@ -116,8 +135,8 @@ async def card(s: AsyncSession, ind: Indicator, ky_req: str) -> dict:
         "nguong_toan_tu": ind.nguong_toan_tu, "muc_tieu_2030": num(ind.muc_tieu_2030), "muc_so_sanh": num(ev.muc_so_sanh),
         "thuc_hien": num(v.gia_tri) if v else None, "du_bao": num(v.du_bao) if v else None,
         "hoan_thanh_pct": num(ev.hoan_thanh_pct), "status": ev.status, "data_state": state,
-        "ky_truoc": {"ky": str(kt), "gia_tri": await _simple(s, ind, str(kt))},
-        "cung_ky": {"ky": str(ck), "gia_tri": await _simple(s, ind, str(ck))},
+        "ky_truoc": await _simple(s, ind, str(kt)),
+        "cung_ky": await _simple(s, ind, str(ck)),
         "nguon": v.nguon if v else ind.nguon_mac_dinh, "nguon_loai": v.nguon_loai if v else None,
         "don_vi_cung_cap": v.don_vi_cung_cap if v else ind.don_vi_chu_quan,
         "nguoi_xac_nhan": v.nguoi_xac_nhan_ten if v else None,

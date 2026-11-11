@@ -36,4 +36,5 @@ class IndicatorValue(Base):
     minh_chung_keys: Mapped[list] = mapped_column(JSONType, default=list)
     ly_do: Mapped[str] = mapped_column(Text, default="")
     version: Mapped[int] = mapped_column(Integer, default=1)
+    dvhc_cu: Mapped[str | None] = mapped_column(String(20), nullable=True, index=True)  # số của đơn vị trước sắp xếp (DT III.2)
     is_sample: Mapped[bool] = mapped_column(Boolean, default=False, index=True)
