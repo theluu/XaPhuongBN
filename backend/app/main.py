@@ -5,6 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.audit.middleware import AuditMiddleware
 from app.auth.router import router as auth_router
 from app.core.db import get_session
+from app.catalog.router import router as catalog_router
 from app.files.router import router as files_router
 from app.indicators.router import router as indicators_router
 from app.indicators.workflow import router as workflow_router
@@ -32,4 +33,5 @@ def create_app() -> FastAPI:
     app.include_router(workflow_router)
     app.include_router(indicators_router)
     app.include_router(files_router)
+    app.include_router(catalog_router)
     return app

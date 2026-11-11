@@ -1,6 +1,6 @@
 import { NavLink, Outlet } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { BellRing, Building2, ClipboardCheck, Database, Gauge, GraduationCap, HardHat, Landmark, LogOut, MonitorPlay, Settings, Target, Users, Wallet } from "lucide-react";
+import { BellRing, Building2, ClipboardCheck, Database, Gauge, GraduationCap, HardHat, Landmark, LogOut, MonitorPlay, ListChecks, Settings, Target, Users, Wallet, Workflow } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { api } from "@/lib/api";
 import { GovHeader } from "./GovHeader";
@@ -11,6 +11,8 @@ import { SampleBanner } from "./SampleBanner";
 const NAV = [
   { to: "/", ten: "Tổng quan", icon: Gauge, nhom: null },
   { to: "/chi-tieu", ten: "Chỉ tiêu KT-XH & Nghị quyết", icon: Target, nhom: "ktxh", module: "ktxh" },
+  { to: "/nhiem-vu", ten: "Nhiệm vụ trọng tâm", icon: ListChecks, nhom: "ktxh" },
+  { to: "/kich-ban", ten: "Kịch bản điều hành", icon: Workflow, nhom: null },
   { to: "/dan-cu", ten: "Dân cư – an sinh", icon: Users, nhom: "dan_cu", module: "dan_cu" },
   { to: "/ngan-sach", ten: "Thu – chi ngân sách", icon: Wallet, nhom: "ngan_sach", module: "ngan_sach" },
   { to: "/dau-tu-cong", ten: "Đầu tư công", icon: Landmark, nhom: "dau_tu_cong", module: "dau_tu_cong" },

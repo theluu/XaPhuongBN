@@ -5,6 +5,9 @@ import { PeriodProvider } from "@/lib/period";
 import { AppShell } from "@/components/AppShell";
 import { LoginPage } from "@/features/auth/LoginPage";
 import { Pending } from "@/features/Pending";
+import { Nq01Page } from "@/features/nq01/Nq01Page";
+import { ProgramsPage } from "@/features/nq01/ProgramsPage";
+import { ScenariosPage } from "@/features/nq01/ScenariosPage";
 
 const qc = new QueryClient({ defaultOptions: { queries: { staleTime: 60_000, refetchOnWindowFocus: false } } });
 
@@ -25,6 +28,9 @@ export default function App() {
               <Route path="/dang-nhap" element={<LoginPage />} />
               <Route element={<Guard />}>
                 <Route index element={<Pending title="Tổng quan" />} />
+                <Route path="chi-tieu" element={<Nq01Page />} />
+                <Route path="nhiem-vu" element={<ProgramsPage />} />
+                <Route path="kich-ban" element={<ScenariosPage />} />
                 <Route path="*" element={<Pending title="Phân hệ" />} />
               </Route>
             </Routes>
