@@ -10,6 +10,11 @@ import { OverviewPage } from "@/features/overview/OverviewPage";
 import { BudgetPage } from "@/features/budget/BudgetPage";
 import { InvestmentPage } from "@/features/investment/InvestmentPage";
 import { ProjectDetail } from "@/features/investment/ProjectDetail";
+import { ConstructionPage } from "@/features/construction/ConstructionPage";
+import { WorkDetail } from "@/features/construction/WorkDetail";
+import { PopulationPage } from "@/features/population/PopulationPage";
+import { ServicesPage } from "@/features/services/ServicesPage";
+import { QualityOfLifePage } from "@/features/quality-of-life/QualityOfLifePage";
 import { ProgramsPage } from "@/features/nq01/ProgramsPage";
 import { ScenariosPage } from "@/features/nq01/ScenariosPage";
 
@@ -38,6 +43,11 @@ export default function App() {
                 <Route path="ngan-sach" element={<BudgetPage />} />
                 <Route path="dau-tu-cong" element={<InvestmentPage />} />
                 <Route path="dau-tu-cong/:ma" element={<ProjectDetail />} />
+                <Route path="cong-trinh" element={<ConstructionPage />} />
+                <Route path="cong-trinh/:ma" element={<WorkDetail />} />
+                <Route path="dan-cu" element={<PopulationPage />} />
+                <Route path="hanh-chinh" element={<ServicesPage />} />
+                <Route path="chat-luong-song" element={<QualityOfLifePage />} />
                 <Route path="*" element={<Pending title="Phân hệ" />} />
               </Route>
             </Routes>
