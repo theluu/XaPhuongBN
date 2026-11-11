@@ -1,0 +1,470 @@
+# Gói mẫu "Phường đô thị" — bộ chỉ tiêu theo Nghị quyết Đại hội Đảng bộ phường (mẫu NQ 01-NQ/ĐU Việt Yên)
+# Mục tiêu chép nguyên Phụ lục 01 của Dự thảo. Mục tiêu đến 2030 KHÔNG được nội suy: phường nhập kế hoạch từng năm.
+ma: phuong_do_thi
+ten: Phường đô thị — bộ chỉ tiêu NQ Đại hội + 7 phân hệ điều hành
+phien_ban: 1
+
+indicators:
+  # ---------- Công tác Đảng, hệ thống chính trị (hằng năm) ----------
+  - ma_chi_tieu: NQ01-01a
+    ten: Tổ chức cơ sở Đảng hoàn thành tốt nhiệm vụ
+    dinh_nghia: Tỷ lệ tổ chức cơ sở Đảng được đánh giá, xếp loại hoàn thành tốt nhiệm vụ trở lên trong năm
+    cong_thuc: Số TCCS Đảng hoàn thành tốt nhiệm vụ trở lên / Tổng số TCCS Đảng được đánh giá × 100
+    pham_vi_dia_ban: Đảng bộ phường
+    nhom: ktxh
+    phan_he: ktxh
+    bo: [NQ01]
+    don_vi_do: "%"
+    chieu: dat_nguong
+    nguong_toan_tu: ">"
+    muc_tieu: 90
+    nguon_mac_dinh: Báo cáo tổ chức Đảng
+    don_vi_chu_quan: Văn phòng Đảng ủy phường
+    ky_cap_nhat: nam
+    han_cap_nhat_ngay: 45
+    phan_loai_thong_tin: noi_bo
+  - ma_chi_tieu: NQ01-01b
+    ten: Đảng viên hoàn thành tốt nhiệm vụ
+    dinh_nghia: Tỷ lệ đảng viên được đánh giá, xếp loại hoàn thành tốt nhiệm vụ trở lên trong năm
+    cong_thuc: Số đảng viên hoàn thành tốt nhiệm vụ trở lên / Tổng số đảng viên được đánh giá × 100
+    pham_vi_dia_ban: Đảng bộ phường
+    nhom: ktxh
+    phan_he: ktxh
+    bo: [NQ01]
+    don_vi_do: "%"
+    chieu: dat_nguong
+    nguong_toan_tu: ">"
+    muc_tieu: 90
+    nguon_mac_dinh: Báo cáo tổ chức Đảng
+    don_vi_chu_quan: Văn phòng Đảng ủy phường
+    ky_cap_nhat: nam
+    han_cap_nhat_ngay: 45
+    phan_loai_thong_tin: noi_bo
+  - ma_chi_tieu: NQ01-02
+    ten: Kết nạp đảng viên mới so với tổng số đảng viên
+    dinh_nghia: Số đảng viên mới kết nạp trong năm so với tổng số đảng viên đầu năm
+    cong_thuc: Số đảng viên kết nạp mới trong năm / Tổng số đảng viên đầu năm × 100
+    pham_vi_dia_ban: Đảng bộ phường
+    nhom: ktxh
+    phan_he: ktxh
+    bo: [NQ01]
+    don_vi_do: "%/năm"
+    chieu: dat_nguong
+    muc_tieu_khoang: [3, 4]
+    nguon_mac_dinh: Công tác Đảng
+    don_vi_chu_quan: Văn phòng Đảng ủy phường
+    ky_cap_nhat: nam
+    han_cap_nhat_ngay: 45
+    phan_loai_thong_tin: noi_bo
+  - ma_chi_tieu: NQ01-03a
+    ten: Tổ trưởng tổ dân phố là đảng viên
+    dinh_nghia: Tỷ lệ tổ trưởng tổ dân phố là đảng viên
+    cong_thuc: Số tổ trưởng TDP là đảng viên / Tổng số TDP × 100
+    pham_vi_dia_ban: Các tổ dân phố
+    nhom: ktxh
+    phan_he: ktxh
+    bo: [NQ01]
+    don_vi_do: "%"
+    chieu: dat_nguong
+    nguong_toan_tu: ">="
+    muc_tieu: 100
+    nguon_mac_dinh: Công tác Đảng
+    don_vi_chu_quan: Văn phòng Đảng ủy phường
+    ky_cap_nhat: nam
+    han_cap_nhat_ngay: 45
+    phan_loai_thong_tin: noi_bo
+  - ma_chi_tieu: NQ01-03b
+    ten: Tổ phó tổ dân phố là đảng viên
+    dinh_nghia: Tỷ lệ tổ phó tổ dân phố là đảng viên
+    cong_thuc: Số tổ phó TDP là đảng viên / Tổng số tổ phó TDP × 100
+    pham_vi_dia_ban: Các tổ dân phố
+    nhom: ktxh
+    phan_he: ktxh
+    bo: [NQ01]
+    don_vi_do: "%"
+    chieu: dat_nguong
+    nguong_toan_tu: ">"
+    muc_tieu: 85
+    nguon_mac_dinh: Công tác Đảng
+    don_vi_chu_quan: Văn phòng Đảng ủy phường
+    ky_cap_nhat: nam
+    han_cap_nhat_ngay: 45
+    phan_loai_thong_tin: noi_bo
+  - ma_chi_tieu: NQ01-04
+    ten: Cơ quan, chính quyền, MTTQ và tổ chức CT-XH hoàn thành tốt nhiệm vụ
+    dinh_nghia: Tỷ lệ cơ quan, chính quyền, MTTQ và các tổ chức chính trị - xã hội hoàn thành tốt nhiệm vụ trở lên
+    cong_thuc: Số cơ quan, tổ chức hoàn thành tốt nhiệm vụ trở lên / Tổng số được đánh giá × 100
+    pham_vi_dia_ban: Hệ thống chính trị phường
+    nhom: ktxh
+    phan_he: ktxh
+    bo: [NQ01]
+    don_vi_do: "%"
+    chieu: dat_nguong
+    nguong_toan_tu: ">"
+    muc_tieu: 90
+    nguon_mac_dinh: Báo cáo đánh giá, xếp loại tổ chức
+    don_vi_chu_quan: Văn phòng Đảng ủy phường
+    ky_cap_nhat: nam
+    han_cap_nhat_ngay: 45
+    phan_loai_thong_tin: han_che
+    ghi_chu: Chỉ tiêu tổ chức, phải được cho phép chia sẻ mới tích hợp
+  # ---------- Kinh tế, ngân sách ----------
+  - ma_chi_tieu: NQ01-05a
+    ten: Tăng tổng thu NSNN trên địa bàn
+    dinh_nghia: Tốc độ tăng tổng thu ngân sách nhà nước phát sinh trên địa bàn phường so với cùng kỳ năm trước
+    cong_thuc: (Tổng thu NSNN trên địa bàn lũy kế kỳ này / cùng kỳ năm trước − 1) × 100
+    pham_vi_dia_ban: Thu trên địa bàn phường (không phải số ngân sách phường được hưởng)
+    nhom: ktxh
+    phan_he: ktxh
+    bo: [NQ01]
+    don_vi_do: "%/năm"
+    chieu: dat_nguong
+    muc_tieu_khoang: [15, 18]
+    scope: dia_ban
+    nguon_mac_dinh: Sở Tài chính / Thuế / UBND phường xác nhận
+    nguon_uu_tien: [chuyen_nganh, phuong, api]
+    don_vi_chu_quan: Bộ phận Tài chính – Kế toán phường
+    ky_cap_nhat: quy
+    han_cap_nhat_ngay: 20
+  - ma_chi_tieu: NQ01-05b
+    ten: Tăng thu nội địa (không tính tiền sử dụng đất)
+    dinh_nghia: Tốc độ tăng thu nội địa trên địa bàn, không tính tiền sử dụng đất, so với cùng kỳ năm trước
+    cong_thuc: (Thu nội địa trừ tiền SDĐ lũy kế kỳ này / cùng kỳ năm trước − 1) × 100
+    pham_vi_dia_ban: Thu trên địa bàn phường
+    nhom: ktxh
+    phan_he: ktxh
+    bo: [NQ01]
+    don_vi_do: "%/năm"
+    chieu: dat_nguong
+    muc_tieu_khoang: [12, 15]
+    scope: dia_ban
+    nguon_mac_dinh: Sở Tài chính / Thuế / UBND phường xác nhận
+    nguon_uu_tien: [chuyen_nganh, phuong, api]
+    don_vi_chu_quan: Bộ phận Tài chính – Kế toán phường
+    ky_cap_nhat: quy
+    han_cap_nhat_ngay: 20
+  - ma_chi_tieu: NQ01-06
+    ten: Tăng tổng giá trị sản phẩm bình quân
+    dinh_nghia: Tốc độ tăng tổng giá trị sản phẩm (giá so sánh) trên địa bàn
+    cong_thuc: (Tổng giá trị sản phẩm năm nay / năm trước − 1) × 100, theo giá so sánh
+    pham_vi_dia_ban: Toàn phường
+    nhom: ktxh
+    phan_he: ktxh
+    bo: [NQ01]
+    don_vi_do: "%/năm"
+    chieu: dat_nguong
+    nguong_toan_tu: ">="
+    muc_tieu: 15
+    nguon_mac_dinh: Nguồn thống kê/kinh tế được thẩm định
+    don_vi_chu_quan: Phòng Kinh tế, Hạ tầng và Đô thị
+    ky_cap_nhat: nam
+    han_cap_nhat_ngay: 60
+  # ---------- Quy hoạch, hạ tầng, đô thị (mục tiêu đến 2030) ----------
+  - ma_chi_tieu: NQ01-07a
+    ten: Hoàn thành Quy hoạch chung đô thị
+    dinh_nghia: Quy hoạch chung đô thị được cấp có thẩm quyền phê duyệt (1 = đã hoàn thành, 0 = chưa)
+    cong_thuc: 1 nếu có quyết định phê duyệt quy hoạch chung; 0 nếu chưa
+    pham_vi_dia_ban: Toàn phường
+    nhom: cong_trinh
+    phan_he: cong_trinh
+    bo: [NQ01]
+    don_vi_do: "có/không"
+    chieu: tang_tot
+    muc_tieu_2030: 1
+    nguon_mac_dinh: Sở Xây dựng / đơn vị quy hoạch
+    don_vi_chu_quan: Phòng Kinh tế, Hạ tầng và Đô thị
+    ky_cap_nhat: nam
+    han_cap_nhat_ngay: 30
+  - ma_chi_tieu: NQ01-07b
+    ten: Tỷ lệ quy hoạch chi tiết
+    dinh_nghia: Tỷ lệ diện tích đất xây dựng đô thị được phủ quy hoạch chi tiết được duyệt
+    cong_thuc: Diện tích có quy hoạch chi tiết được duyệt / Diện tích đất xây dựng đô thị × 100
+    pham_vi_dia_ban: Toàn phường
+    nhom: cong_trinh
+    phan_he: cong_trinh
+    bo: [NQ01]
+    don_vi_do: "%"
+    chieu: tang_tot
+    muc_tieu_2030: 50
+    nguon_mac_dinh: Sở Xây dựng / đơn vị quy hoạch
+    don_vi_chu_quan: Phòng Kinh tế, Hạ tầng và Đô thị
+    ky_cap_nhat: nam
+    han_cap_nhat_ngay: 30
+  - ma_chi_tieu: NQ01-08a
+    ten: Đất giao thông bình quân đầu người
+    dinh_nghia: Diện tích đất giao thông đô thị bình quân trên một người dân
+    cong_thuc: Tổng diện tích đất giao thông (m²) / Dân số thường trú
+    pham_vi_dia_ban: Toàn phường
+    nhom: cong_trinh
+    phan_he: cong_trinh
+    bo: [NQ01]
+    don_vi_do: "m²/người"
+    chieu: tang_tot
+    muc_tieu_2030: 33
+    nguon_mac_dinh: Dữ liệu địa chính, hạ tầng
+    don_vi_chu_quan: Phòng Kinh tế, Hạ tầng và Đô thị
+    ky_cap_nhat: nam
+    han_cap_nhat_ngay: 30
+    ghi_chu: Công thức, mẫu số cần thống nhất
+  - ma_chi_tieu: NQ01-08b
+    ten: Đường được chiếu sáng
+    dinh_nghia: Tỷ lệ chiều dài đường đô thị được chiếu sáng
+    cong_thuc: Chiều dài đường được chiếu sáng / Tổng chiều dài đường đô thị × 100
+    pham_vi_dia_ban: Toàn phường
+    nhom: cong_trinh
+    phan_he: cong_trinh
+    bo: [NQ01]
+    don_vi_do: "%"
+    chieu: tang_tot
+    muc_tieu_2030: 95
+    nguon_mac_dinh: Dữ liệu hạ tầng / chiếu sáng
+    don_vi_chu_quan: Phòng Kinh tế, Hạ tầng và Đô thị
+    ky_cap_nhat: nam
+    han_cap_nhat_ngay: 30
+    ghi_chu: Công thức, mẫu số cần thống nhất
+  # ---------- Thu nhập, an sinh ----------
+  - ma_chi_tieu: NQ01-09
+    ten: Thu nhập bình quân đầu người
+    dinh_nghia: Thu nhập bình quân một người một năm của dân cư trên địa bàn
+    cong_thuc: Tổng thu nhập của hộ dân cư / Tổng số nhân khẩu (theo điều tra, thống kê)
+    pham_vi_dia_ban: Toàn phường
+    nhom: ktxh
+    phan_he: ktxh
+    bo: [NQ01]
+    don_vi_do: "triệu đồng/người/năm"
+    chieu: tang_tot
+    muc_tieu_2030: 95
+    nguon_mac_dinh: Điều tra/thống kê có xác nhận
+    don_vi_chu_quan: Phòng Kinh tế, Hạ tầng và Đô thị
+    ky_cap_nhat: nam
+    han_cap_nhat_ngay: 60
+  - ma_chi_tieu: NQ01-10
+    ten: Hộ nghèo theo chuẩn nghèo đa chiều 2021–2025
+    dinh_nghia: Số hộ nghèo còn lại theo chuẩn nghèo đa chiều giai đoạn 2021–2025
+    cong_thuc: Tổng số hộ nghèo theo kết quả rà soát được phê duyệt
+    pham_vi_dia_ban: Toàn phường
+    nhom: dan_cu
+    phan_he: dan_cu
+    bo: [NQ01]
+    don_vi_do: "hộ"
+    chieu: giam_tot
+    muc_tieu: 0
+    han_muc_tieu_nam: 2027
+    nguon_mac_dinh: Kết quả rà soát hộ nghèo
+    don_vi_chu_quan: Phòng Văn hóa – Xã hội
+    ky_cap_nhat: quy
+    han_cap_nhat_ngay: 20
+    ghi_chu: Khi đo lường thực tế cần kiểm tra chuẩn áp dụng
+  # ---------- Giáo dục, y tế, môi trường ----------
+  - ma_chi_tieu: NQ01-11
+    ten: Trường đạt chuẩn quốc gia mức độ 2
+    dinh_nghia: Tỷ lệ trường học trên địa bàn đạt chuẩn quốc gia mức độ 2
+    cong_thuc: Số trường đạt chuẩn quốc gia mức độ 2 / Tổng số trường × 100
+    pham_vi_dia_ban: Các trường công lập trên địa bàn
+    nhom: gd_yt_mt
+    phan_he: gd_yt_mt
+    bo: [NQ01]
+    don_vi_do: "%"
+    chieu: tang_tot
+    muc_tieu_2030: 88.9
+    nguon_mac_dinh: Nguồn giáo dục xác nhận
+    don_vi_chu_quan: Phòng Văn hóa – Xã hội
+    ky_cap_nhat: nam
+    han_cap_nhat_ngay: 30
+  - ma_chi_tieu: NQ01-12
+    ten: Tỷ lệ dân số tham gia BHYT
+    dinh_nghia: Tỷ lệ dân số trên địa bàn có thẻ bảo hiểm y tế còn hiệu lực
+    cong_thuc: Số người có thẻ BHYT còn hiệu lực / Dân số × 100
+    pham_vi_dia_ban: Toàn phường
+    nhom: gd_yt_mt
+    phan_he: gd_yt_mt
+    bo: [NQ01]
+    don_vi_do: "%"
+    chieu: tang_tot
+    muc_tieu_2030: 99.8
+    nguon_mac_dinh: BHXH / chuyên ngành xác nhận
+    nguon_uu_tien: [chuyen_nganh, phuong, api]
+    don_vi_chu_quan: Phòng Văn hóa – Xã hội
+    ky_cap_nhat: thang
+    han_cap_nhat_ngay: 15
+  - ma_chi_tieu: NQ01-13a
+    ten: Giải quyết đơn thư thuộc thẩm quyền
+    dinh_nghia: Tỷ lệ đơn thư khiếu nại, tố cáo, kiến nghị thuộc thẩm quyền được giải quyết
+    cong_thuc: Số đơn thư thuộc thẩm quyền đã giải quyết / Tổng số đơn thư thuộc thẩm quyền phải giải quyết × 100
+    pham_vi_dia_ban: Đơn thư thuộc thẩm quyền UBND phường
+    nhom: ktxh
+    phan_he: tthc_pakn
+    bo: [NQ01]
+    don_vi_do: "%"
+    chieu: dat_nguong
+    nguong_toan_tu: ">="
+    muc_tieu: 98
+    nguon_mac_dinh: Sổ theo dõi tiếp công dân, xử lý đơn thư
+    don_vi_chu_quan: Văn phòng HĐND – UBND phường
+    ky_cap_nhat: quy
+    han_cap_nhat_ngay: 15
+    ghi_chu: Không gộp chung với chỉ tiêu hồ sơ TTHC đúng hạn hoặc phản ánh hiện trường
+  - ma_chi_tieu: NQ01-13b
+    ten: Thực hiện kiến nghị, kết luận giải quyết tố cáo, quyết định giải quyết khiếu nại
+    dinh_nghia: Tỷ lệ kiến nghị, kết luận giải quyết tố cáo, quyết định giải quyết khiếu nại có hiệu lực được thực hiện
+    cong_thuc: Số kiến nghị, kết luận, quyết định đã thực hiện xong / Tổng số phải thực hiện × 100
+    pham_vi_dia_ban: Thuộc thẩm quyền UBND phường
+    nhom: ktxh
+    phan_he: tthc_pakn
+    bo: [NQ01]
+    don_vi_do: "%"
+    chieu: dat_nguong
+    nguong_toan_tu: ">="
+    muc_tieu: 95
+    nguon_mac_dinh: Sổ theo dõi thực hiện kết luận
+    don_vi_chu_quan: Văn phòng HĐND – UBND phường
+    ky_cap_nhat: quy
+    han_cap_nhat_ngay: 15
+    ghi_chu: Không gộp chung với chỉ tiêu hồ sơ TTHC đúng hạn hoặc phản ánh hiện trường
+  - ma_chi_tieu: NQ01-13c
+    ten: Thực hiện kiến nghị sau thanh tra, kiểm tra, giám sát, kiểm toán
+    dinh_nghia: Tỷ lệ kiến nghị sau thanh tra, kiểm tra, giám sát, kiểm toán được thực hiện
+    cong_thuc: Số kiến nghị đã thực hiện xong / Tổng số kiến nghị phải thực hiện × 100
+    pham_vi_dia_ban: Thuộc thẩm quyền UBND phường
+    nhom: ktxh
+    phan_he: tthc_pakn
+    bo: [NQ01]
+    don_vi_do: "%"
+    chieu: dat_nguong
+    nguong_toan_tu: ">="
+    muc_tieu: 97
+    nguon_mac_dinh: Sổ theo dõi kiến nghị sau thanh tra, kiểm tra
+    don_vi_chu_quan: Văn phòng HĐND – UBND phường
+    ky_cap_nhat: quy
+    han_cap_nhat_ngay: 15
+    ghi_chu: Không gộp chung với chỉ tiêu hồ sơ TTHC đúng hạn hoặc phản ánh hiện trường
+  - ma_chi_tieu: NQ01-14
+    ten: Dân số được cung cấp nước sạch đạt quy chuẩn
+    dinh_nghia: Tỷ lệ dân số được sử dụng nước sạch đạt quy chuẩn kỹ thuật
+    cong_thuc: Số nhân khẩu sử dụng nước sạch đạt quy chuẩn / Dân số × 100
+    pham_vi_dia_ban: Toàn phường
+    nhom: gd_yt_mt
+    phan_he: gd_yt_mt
+    bo: [NQ01]
+    don_vi_do: "%"
+    chieu: tang_tot
+    muc_tieu_2030: 100
+    nguon_mac_dinh: Đơn vị cấp nước / chuyên ngành xác nhận
+    don_vi_chu_quan: Phòng Kinh tế, Hạ tầng và Đô thị
+    ky_cap_nhat: quy
+    han_cap_nhat_ngay: 20
+  - ma_chi_tieu: NQ01-15
+    ten: Thu gom, xử lý rác thải sinh hoạt
+    dinh_nghia: Tỷ lệ khối lượng chất thải rắn sinh hoạt được thu gom, xử lý
+    cong_thuc: Khối lượng rác sinh hoạt được thu gom, xử lý / Khối lượng phát sinh × 100
+    pham_vi_dia_ban: Toàn phường
+    nhom: gd_yt_mt
+    phan_he: gd_yt_mt
+    bo: [NQ01]
+    don_vi_do: "%"
+    chieu: tang_tot
+    muc_tieu_2030: 100
+    nguon_mac_dinh: Đơn vị môi trường / UBND phường xác nhận
+    don_vi_chu_quan: Phòng Kinh tế, Hạ tầng và Đô thị
+    ky_cap_nhat: thang
+    han_cap_nhat_ngay: 15
+  - ma_chi_tieu: NQ01-16
+    ten: Nước thải đô thị được xử lý đạt quy chuẩn
+    dinh_nghia: Tỷ lệ nước thải sinh hoạt đô thị được thu gom và xử lý đạt quy chuẩn
+    cong_thuc: Lượng nước thải được xử lý đạt quy chuẩn / Tổng lượng nước thải đô thị × 100
+    pham_vi_dia_ban: Toàn phường
+    nhom: gd_yt_mt
+    phan_he: gd_yt_mt
+    bo: [NQ01]
+    don_vi_do: "%"
+    chieu: tang_tot
+    muc_tieu_2030: 15
+    nguon_mac_dinh: Nguồn môi trường / hạ tầng xác nhận
+    don_vi_chu_quan: Phòng Kinh tế, Hạ tầng và Đô thị
+    ky_cap_nhat: quy
+    han_cap_nhat_ngay: 20
+  # ---------- Chỉ tiêu bổ sung theo Dự thảo II.5, II.7 ----------
+  - ma_chi_tieu: DT-CX
+    ten: Diện tích cây xanh công cộng bình quân
+    dinh_nghia: Diện tích cây xanh sử dụng công cộng bình quân trên một người dân
+    cong_thuc: Tổng diện tích cây xanh công cộng (m²) / Dân số
+    pham_vi_dia_ban: Toàn phường
+    nhom: cong_trinh
+    phan_he: cong_trinh
+    don_vi_do: "m²/người"
+    chieu: tang_tot
+    nguon_mac_dinh: Dữ liệu hạ tầng đô thị
+    don_vi_chu_quan: Phòng Kinh tế, Hạ tầng và Đô thị
+    ky_cap_nhat: nam
+    han_cap_nhat_ngay: 30
+  - ma_chi_tieu: DT-TRUONG
+    ten: Số trường học
+    dinh_nghia: Tổng số trường mầm non, tiểu học, THCS trên địa bàn
+    cong_thuc: Đếm số trường đang hoạt động
+    pham_vi_dia_ban: Toàn phường
+    nhom: gd_yt_mt
+    phan_he: gd_yt_mt
+    don_vi_do: "trường"
+    chieu: theo_doi
+    nguon_mac_dinh: Nguồn giáo dục xác nhận
+    don_vi_chu_quan: Phòng Văn hóa – Xã hội
+    ky_cap_nhat: nam
+    han_cap_nhat_ngay: 45
+    phan_loai_thong_tin: cong_khai
+  - ma_chi_tieu: DT-LOP
+    ten: Số lớp học
+    dinh_nghia: Tổng số lớp học các cấp trên địa bàn
+    cong_thuc: Đếm số lớp theo báo cáo đầu năm học
+    pham_vi_dia_ban: Toàn phường
+    nhom: gd_yt_mt
+    phan_he: gd_yt_mt
+    don_vi_do: "lớp"
+    chieu: theo_doi
+    nguon_mac_dinh: Nguồn giáo dục xác nhận
+    don_vi_chu_quan: Phòng Văn hóa – Xã hội
+    ky_cap_nhat: nam
+    han_cap_nhat_ngay: 45
+    phan_loai_thong_tin: cong_khai
+  - ma_chi_tieu: DT-HS
+    ten: Số học sinh
+    dinh_nghia: Tổng số học sinh các cấp trên địa bàn
+    cong_thuc: Đếm số học sinh theo báo cáo đầu năm học
+    pham_vi_dia_ban: Toàn phường
+    nhom: gd_yt_mt
+    phan_he: gd_yt_mt
+    don_vi_do: "học sinh"
+    chieu: theo_doi
+    nguon_mac_dinh: Nguồn giáo dục xác nhận
+    don_vi_chu_quan: Phòng Văn hóa – Xã hội
+    ky_cap_nhat: nam
+    han_cap_nhat_ngay: 45
+    phan_loai_thong_tin: cong_khai
+
+programs:
+  - {ma: NV-01, ten: "Nhiệm vụ trọng tâm số 1 – chờ phường cung cấp", mo_ta: "Điền theo Nghị quyết 01-NQ/ĐU", indicator_mas: []}
+  - {ma: NV-02, ten: "Nhiệm vụ trọng tâm số 2 – chờ phường cung cấp", mo_ta: "Điền theo Nghị quyết 01-NQ/ĐU", indicator_mas: []}
+  - {ma: NV-03, ten: "Nhiệm vụ trọng tâm số 3 – chờ phường cung cấp", mo_ta: "Điền theo Nghị quyết 01-NQ/ĐU", indicator_mas: []}
+  - {ma: NV-04, ten: "Nhiệm vụ trọng tâm số 4 – chờ phường cung cấp", mo_ta: "Điền theo Nghị quyết 01-NQ/ĐU", indicator_mas: []}
+  - {ma: NV-05, ten: "Nhiệm vụ trọng tâm số 5 – chờ phường cung cấp", mo_ta: "Điền theo Nghị quyết 01-NQ/ĐU", indicator_mas: []}
+  - {ma: NV-06, ten: "Nhiệm vụ trọng tâm số 6 – chờ phường cung cấp", mo_ta: "Điền theo Nghị quyết 01-NQ/ĐU", indicator_mas: []}
+  - {ma: NV-07, ten: "Nhiệm vụ trọng tâm số 7 – chờ phường cung cấp", mo_ta: "Điền theo Nghị quyết 01-NQ/ĐU", indicator_mas: []}
+  - {ma: NV-08, ten: "Nhiệm vụ trọng tâm số 8 – chờ phường cung cấp", mo_ta: "Điền theo Nghị quyết 01-NQ/ĐU", indicator_mas: []}
+
+scenarios:
+  - {ma: KB-01, ten: "Điều hành các chỉ tiêu kinh tế - xã hội và Nghị quyết Đại hội", indicator_mas: [NQ01-01a, NQ01-01b, NQ01-02, NQ01-03a, NQ01-03b, NQ01-04, NQ01-05a, NQ01-05b, NQ01-06, NQ01-09], rule_codes: [CT_CHAM_KH, CT_QUA_HAN_CAP_NHAT, CT_LECH_NGUON], layout: {phan_he: ktxh}}
+  - {ma: KB-02, ten: "Dữ liệu dân cư, an sinh và cơ cấu dân số", indicator_mas: [NQ01-10], rule_codes: [CT_QUA_HAN_CAP_NHAT], layout: {phan_he: dan_cu}}
+  - {ma: KB-03, ten: "Theo dõi thu, chi ngân sách phường", indicator_mas: [NQ01-05a, NQ01-05b], rule_codes: [NS_THU_NGUY_CO_KY, NS_LECH_API_CHOT, NS_CHI_VUOT_DT, NS_CAP_NHAT_CHAM], layout: {phan_he: ngan_sach}}
+  - {ma: KB-04, ten: "Giải ngân vốn đầu tư công chi tiết tại phường", indicator_mas: [], rule_codes: [DA_CHAM_LICH_VON, DA_QUA_HAN_MOC], layout: {phan_he: dau_tu_cong}}
+  - {ma: KB-05, ten: "Tiến độ công trình xây dựng, chỉnh trang và quản lý đô thị", indicator_mas: [NQ01-07a, NQ01-07b, NQ01-08a, NQ01-08b, DT-CX], rule_codes: [CT_TRE_MOC, CT_TT_THAP_HON_KH, CT_THIEU_HO_SO_VUONG_MAC], layout: {phan_he: cong_trinh}}
+  - {ma: KB-06, ten: "Hành chính công, phản ánh kiến nghị và phục vụ người dân", indicator_mas: [NQ01-13a, NQ01-13b, NQ01-13c], rule_codes: [TTHC_QUA_HAN, PAKN_GAN_HAN, PAKN_QUA_HAN], layout: {phan_he: tthc_pakn}}
+  - {ma: KB-07, ten: "Giáo dục, y tế, môi trường và chất lượng sống", indicator_mas: [NQ01-11, NQ01-12, NQ01-14, NQ01-15, NQ01-16, DT-TRUONG, DT-LOP, DT-HS], rule_codes: [GDYTMT_DUOI_MUC_TIEU, DV_CHUA_GUI_DU_LIEU], layout: {phan_he: gd_yt_mt}}
+  - {ma: KB-08, ten: "Kịch bản điều hành số 8 – chờ danh mục 15 kịch bản của thành phố", trang_thai: cho_cau_hinh}
+  - {ma: KB-09, ten: "Kịch bản điều hành số 9 – chờ danh mục 15 kịch bản của thành phố", trang_thai: cho_cau_hinh}
+  - {ma: KB-10, ten: "Kịch bản điều hành số 10 – chờ danh mục 15 kịch bản của thành phố", trang_thai: cho_cau_hinh}
+  - {ma: KB-11, ten: "Kịch bản điều hành số 11 – chờ danh mục 15 kịch bản của thành phố", trang_thai: cho_cau_hinh}
+  - {ma: KB-12, ten: "Kịch bản điều hành số 12 – chờ danh mục 15 kịch bản của thành phố", trang_thai: cho_cau_hinh}
+  - {ma: KB-13, ten: "Kịch bản điều hành số 13 – chờ danh mục 15 kịch bản của thành phố", trang_thai: cho_cau_hinh}
+  - {ma: KB-14, ten: "Kịch bản điều hành số 14 – chờ danh mục 15 kịch bản của thành phố", trang_thai: cho_cau_hinh}
+  - {ma: KB-15, ten: "Kịch bản điều hành số 15 – chờ danh mục 15 kịch bản của thành phố", trang_thai: cho_cau_hinh}
+  - {ma: KB-BS-01, ten: "Kịch bản bổ sung số 1 – chờ phường cung cấp", la_bo_sung: true, trang_thai: cho_cau_hinh}
+  - {ma: KB-BS-02, ten: "Kịch bản bổ sung số 2 – chờ phường cung cấp", la_bo_sung: true, trang_thai: cho_cau_hinh}

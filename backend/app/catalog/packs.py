@@ -24,9 +24,9 @@ async def apply_pack(s: AsyncSession, tenant_id: int, pack: dict) -> None:
     ids: dict[str, int] = {}
     for raw in pack.get("indicators", []):
         data = IndicatorIn(**raw).model_dump(mode="json")
-        for k in ("muc_tieu", "muc_tieu_2030"):
+        for k in ("muc_tieu", "muc_tieu_2030", "muc_tieu_khoang"):
             if raw.get(k) is not None:
-                data[k] = raw[k]
+                data[k] = raw[k]  # giữ kiểu số (JSON dump đổi Decimal thành chuỗi)
         row = await _upsert(s, Indicator, tenant_id, "ma_chi_tieu", data.pop("ma_chi_tieu"), data, pack)
         await s.flush()
         ids[row.ma_chi_tieu] = row.id

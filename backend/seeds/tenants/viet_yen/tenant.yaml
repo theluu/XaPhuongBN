@@ -1,0 +1,24 @@
+platform: {ma_dvhc: NEN-TANG, ten: Nền tảng điều hành số xã/phường, cap: nen_tang}
+parent: {ma_dvhc: T-BACNINH, ten: Tỉnh Bắc Ninh, cap: tinh}
+tenant:
+  ma_dvhc: P-VIETYEN
+  ten: Phường Việt Yên
+  cap: phuong
+  config:
+    ten_co_quan: ["ĐẢNG ỦY – UBND PHƯỜNG VIỆT YÊN", "Hệ thống điều hành số phường"]
+    tinh: Bắc Ninh
+    ban_do: {tam: [21.2725, 106.0975], zoom: 14}
+    cho_phep_theo_tdp: true
+    logo: null
+  modules: {ktxh: bat, dan_cu: bat, ngan_sach: bat, dau_tu_cong: bat, cong_trinh: bat, tthc_pakn: bat, gd_yt_mt: bat}
+pack: phuong_do_thi
+so_tdp: 12
+users:
+  - {username: nentang, ho_ten: Quản trị nền tảng, chuc_danh: Kỹ thuật viên vận hành, role: quan_tri_nen_tang, platform: true}
+  - {username: qtphuong, ho_ten: Nguyễn Thị Hà, chuc_danh: Công chức Văn phòng – Thống kê, role: quan_tri_don_vi}
+  - {username: bithu, ho_ten: Trần Văn Bình, chuc_danh: Bí thư Đảng ủy, role: lanh_dao}
+  - {username: chutich, ho_ten: Lê Minh Châu, chuc_danh: Chủ tịch UBND, role: lanh_dao}
+  - {username: ketoan, ho_ten: Phạm Thu Dung, chuc_danh: Kế toán ngân sách, role: xac_nhan, nhom: [ngan_sach, dau_tu_cong]}
+  - {username: xacnhan, ho_ten: Hoàng Văn Đức, chuc_danh: Phó Chủ tịch UBND, role: xac_nhan, nhom: [ktxh, dan_cu, cong_trinh, tthc_pakn, gd_yt_mt]}
+  - {username: canbo1, ho_ten: Vũ Thị Giang, chuc_danh: Công chức Văn phòng – Thống kê, role: nhap_lieu, nhom: [ktxh, dan_cu, ngan_sach, dau_tu_cong, cong_trinh, tthc_pakn, gd_yt_mt]}
+  - {username: xem, ho_ten: Màn hình phòng họp, chuc_danh: Tài khoản trình chiếu, role: nguoi_xem}
