@@ -15,6 +15,8 @@ import { WorkDetail } from "@/features/construction/WorkDetail";
 import { PopulationPage } from "@/features/population/PopulationPage";
 import { ServicesPage } from "@/features/services/ServicesPage";
 import { QualityOfLifePage } from "@/features/quality-of-life/QualityOfLifePage";
+import { AlertsBoard } from "@/features/alerts/AlertsBoard";
+import { DataEntryPage } from "@/features/data-entry/DataEntryPage";
 import { ProgramsPage } from "@/features/nq01/ProgramsPage";
 import { ScenariosPage } from "@/features/nq01/ScenariosPage";
 
@@ -48,6 +50,8 @@ export default function App() {
                 <Route path="dan-cu" element={<PopulationPage />} />
                 <Route path="hanh-chinh" element={<ServicesPage />} />
                 <Route path="chat-luong-song" element={<QualityOfLifePage />} />
+                <Route path="canh-bao" element={<AlertsBoard />} />
+                <Route path="nhap-lieu" element={<DataEntryPage />} />
                 <Route path="*" element={<Pending title="Phân hệ" />} />
               </Route>
             </Routes>

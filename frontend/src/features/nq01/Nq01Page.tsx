@@ -1,6 +1,7 @@
 import * as Tabs from "@radix-ui/react-tabs";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { api } from "@/lib/api";
 import { formatNumber, formatPeriod } from "@/lib/format";
 import { usePeriod } from "@/lib/period";
@@ -33,7 +34,9 @@ function reasons(c: IndicatorCard): string[] {
 export function Nq01Page() {
   const { ky } = usePeriod();
   const [tab, setTab] = useState<"all" | Status>("all");
-  const [open, setOpen] = useState<string | null>(null);
+  const [params, setParams] = useSearchParams();
+  const open = params.get("ma");
+  const setOpen = (ma: string | null) => setParams(ma ? { ma } : {});
   const q = useQuery({ queryKey: ["indicators", "NQ01", ky], queryFn: () => api<IndicatorCard[]>("/api/indicators", { params: { bo: "NQ01", ky } }) });
   const cards = useMemo(() => q.data ?? [], [q.data]);
   const count = (k: "all" | Status) => (k === "all" ? cards.length : cards.filter((c) => c.status === k).length);

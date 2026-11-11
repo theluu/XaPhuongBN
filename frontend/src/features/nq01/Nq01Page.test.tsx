@@ -74,3 +74,10 @@ describe("Trang chỉ tiêu Nghị quyết", () => {
     expect(within(dlg).getByRole("table", { name: "Lịch sử số liệu" })).toBeInTheDocument();
   });
 });
+
+describe("Liên kết trực tiếp tới chỉ tiêu", () => {
+  it("?ma= mở sẵn ngăn chi tiết", async () => {
+    renderWithProviders(<Nq01Page />, "/chi-tieu?ma=NQ01-12");
+    expect(await screen.findByRole("dialog")).toBeInTheDocument();
+  });
+});
