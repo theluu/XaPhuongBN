@@ -110,6 +110,15 @@ async def module_status(s: AsyncSession, tenant_id: int) -> dict[str, str]:
         select(Indicator.phan_he).join(IndicatorValue, IndicatorValue.indicator_id == Indicator.id)
         .where(IndicatorValue.tenant_id == tenant_id, IndicatorValue.trang_thai == "da_xac_nhan").distinct()
     )).scalars())
+    from app.budget.models import BudgetLine
+    from app.population.models import PopulationStat
+    from app.projects.models import Project
+    from app.services_pakn.models import AdminServiceStat
+    from app.works.models import Work
+
+    for ph, model in (("ngan_sach", BudgetLine), ("dau_tu_cong", Project), ("cong_trinh", Work), ("tthc_pakn", AdminServiceStat), ("dan_cu", PopulationStat)):
+        if (await s.execute(select(model.id).where(model.tenant_id == tenant_id).limit(1))).first():
+            manual.add(ph)
     out: dict[str, str] = {}
     for ph in PHAN_HE:
         if (tenant.modules or {}).get(ph) == "tat":

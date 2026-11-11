@@ -85,3 +85,10 @@ async def test_history_rollup_via_mapping(client):
     assert cards["SO-HO-NGHEO"]["cung_ky"] == {"ky": "2025-10", "gia_tri": 150, "gop_tu": ["XA-A", "XA-B"]}
     assert cards["TY-LE"]["cung_ky"]["gia_tri"] is None  # tỷ lệ không được cộng gộp
     assert cards["SO-HO-NGHEO"]["thuc_hien"] == 160  # số của đơn vị cũ không lẫn vào kỳ hiện tại
+
+
+async def test_tile_notes_use_vietnamese_number_format(client):
+    h = await _vy_token(client)
+    j = (await client.get("/api/overview", params={"ky": "2026-10"}, headers=h)).json()
+    tile = next(c for c in j["the_chi_so"] if c["ma"] == "NS-THU-DB")
+    assert tile["ghi_chu"] == "Dự toán năm 441 tỷ đồng"

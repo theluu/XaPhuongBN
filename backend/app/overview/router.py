@@ -12,6 +12,7 @@ from app.budget.service import summary as budget_summary
 from app.catalog.cycles import DEFAULT_CYCLES
 from app.catalog.models import Indicator
 from app.core.db import admin_sessionmaker
+from app.core.format_vn import vn
 from app.core.json import jsonable
 from app.core.principal import CurrentUser
 from app.indicators.models import IndicatorValue
@@ -64,7 +65,7 @@ async def _tiles(s: AsyncSession, user: CurrentUser, tid: int, ky: str, tdp: int
             out.append(tile(ma, ten, _bil(t["thuc_hien"]), "tỷ đồng", ky, "/ngan-sach", "ngan_sach", ke_hoach=_bil(t["ke_hoach_ky"]),
                             muc_so_sanh=_bil(t["ke_hoach_ky"]), hoan_thanh=float(t["ty_le_pct"]) if t["ty_le_pct"] is not None else None, status=st,
                             data_state="tam_thoi" if b["cho_doi_soat"] else "da_xac_nhan", nguon="Báo cáo thu ngân sách",
-                            don_vi_cung_cap="Bộ phận Tài chính – Kế toán", ghi_chu=f"Dự toán năm {_bil(t['du_toan'])} tỷ đồng",
+                            don_vi_cung_cap="Bộ phận Tài chính – Kế toán", ghi_chu=f"Dự toán năm {vn(_bil(t['du_toan']), 1)} tỷ đồng",
                             is_sample=b["is_sample"], thoi_diem_chot=b["ngay_chot_gan_nhat"]))
     if user.can("doc", "dau_tu_cong"):
         p = await project_summary(s, tid, ky)
@@ -97,7 +98,7 @@ async def _tiles(s: AsyncSession, user: CurrentUser, tid: int, ky: str, tdp: int
         out.append(tile("TTHC-DH", "Hồ sơ TTHC giải quyết đúng hạn (30 ngày)", float(dh) if dh is not None else None, "%", ky, "/hanh-chinh", "tthc_pakn",
                         status="dat" if dh is not None and dh >= 98 else ("nguy_co" if dh is not None else "chua_du_du_lieu"), muc_so_sanh=98,
                         data_state="tam_thoi" if tt["co_so_tam_thoi"] else "da_xac_nhan", nguon="Biểu mẫu động (luồng DVCQG gián đoạn)",
-                        don_vi_cung_cap="Bộ phận Một cửa", ghi_chu=f"{tt['tong']['tiep_nhan']} hồ sơ tiếp nhận", is_sample=tt["is_sample"]))
+                        don_vi_cung_cap="Bộ phận Một cửa", ghi_chu=f"{vn(tt['tong']['tiep_nhan'], 0)} hồ sơ tiếp nhận", is_sample=tt["is_sample"]))
         pk = await pakn_summary(s, tid, today - timedelta(days=90), today, today)
         out.append(tile("PAKN-QH", "Phản ánh kiến nghị quá hạn", float(pk["theo_trang_thai"]["qua_han"]), "phản ánh", ky, "/hanh-chinh", "tthc_pakn",
                         status="nguy_co" if pk["theo_trang_thai"]["qua_han"] else "dat", nguon="Hệ thống phản ánh kiến nghị (API)",

@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { formatNumber, formatPeriod } from "@/lib/format";
 import { STATUS_COLOR } from "@/lib/labels";
 import type { IndicatorCard } from "@/lib/types";
@@ -28,6 +29,8 @@ export function KpiTile({ card, size = "md", onOpen }: { card: IndicatorCard; si
         <h3 className={`flex-1 font-semibold leading-snug ${xl ? "text-lg" : "text-[15px]"}`}>
           {onOpen ? (
             <button type="button" onClick={onOpen} className="text-left hover:underline">{card.ten}</button>
+          ) : card.link ? (
+            <Link to={card.link} className="hover:underline">{card.ten}</Link>
           ) : card.ten}
         </h3>
         <ProvenanceStamp card={card} size={xl ? 40 : 30} />
@@ -39,6 +42,7 @@ export function KpiTile({ card, size = "md", onOpen }: { card: IndicatorCard; si
         <span className="text-sm text-muc-nhat">{card.don_vi}</span>
       </div>
       {target && <div className="mt-1 text-[13px] text-muc-nhat">{target}</div>}
+      {card.ghi_chu && <div className="mt-0.5 text-[13px] text-muc-nhat">{card.ghi_chu}</div>}
       <div className="mt-auto flex items-center justify-between gap-2 pt-2">
         <span className="text-[13px] text-muc-nhat">{formatPeriod(card.ky)}</span>
         <StatusBadge status={card.status} />

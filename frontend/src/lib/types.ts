@@ -22,8 +22,8 @@ export interface IndicatorCard {
   hoan_thanh_pct: number | null;
   status: Status;
   data_state: DataState;
-  ky_truoc: { ky: string; gia_tri: number | null };
-  cung_ky: { ky: string; gia_tri: number | null };
+  ky_truoc: { ky: string; gia_tri: number | null; gop_tu?: string[] };
+  cung_ky: { ky: string; gia_tri: number | null; gop_tu?: string[] };
   nguon: string;
   nguon_loai: string | null;
   don_vi_cung_cap: string;
@@ -36,6 +36,8 @@ export interface IndicatorCard {
   phan_loai_thong_tin: string;
   ky_cap_nhat: string;
   value_id: number | null;
+  link?: string;
+  ghi_chu?: string;
 }
 
 export interface TenantInfo {
@@ -45,7 +47,7 @@ export interface TenantInfo {
   cap: string;
   ten_co_quan: string[];
   logo_url: string | null;
-  ban_do: { tam: [number, number]; zoom: number } | null;
+  ban_do: { tam: [number, number]; zoom: number; tile_url?: string } | null;
   cho_phep_theo_tdp: boolean;
   modules: Record<string, "bat" | "dang_ket_noi" | "tat">;
 }

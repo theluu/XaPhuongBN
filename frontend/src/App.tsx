@@ -6,6 +6,7 @@ import { AppShell } from "@/components/AppShell";
 import { LoginPage } from "@/features/auth/LoginPage";
 import { Pending } from "@/features/Pending";
 import { Nq01Page } from "@/features/nq01/Nq01Page";
+import { OverviewPage } from "@/features/overview/OverviewPage";
 import { ProgramsPage } from "@/features/nq01/ProgramsPage";
 import { ScenariosPage } from "@/features/nq01/ScenariosPage";
 
@@ -27,7 +28,7 @@ export default function App() {
             <Routes>
               <Route path="/dang-nhap" element={<LoginPage />} />
               <Route element={<Guard />}>
-                <Route index element={<Pending title="Tổng quan" />} />
+                <Route index element={<OverviewPage />} />
                 <Route path="chi-tieu" element={<Nq01Page />} />
                 <Route path="nhiem-vu" element={<ProgramsPage />} />
                 <Route path="kich-ban" element={<ScenariosPage />} />

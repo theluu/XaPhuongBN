@@ -107,3 +107,18 @@ async def test_module_on_when_confirmed_manual_data_exists():
     await add_value(t, iid, "2026-10", 5)
     async with admin_sessionmaker()() as s:
         assert (await module_status(s, t))["gd_yt_mt"] == "bat"
+
+
+async def test_module_on_when_module_tables_have_data():
+    from datetime import UTC, datetime
+    from decimal import Decimal
+
+    from app.budget.models import BudgetLine
+
+    t = await make_tenant()
+    async with admin_sessionmaker()() as s:
+        assert (await module_status(s, t))["ngan_sach"] == "dang_ket_noi"
+        s.add(BudgetLine(tenant_id=t, nam=2026, ky="2026-10", loai="thu", nhom_ma="X", scope="dia_ban", du_toan=Decimal(1),
+                         nguon_loai="bao_cao_chot", ngay_chot=datetime(2026, 11, 1, tzinfo=UTC)))
+        await s.commit()
+        assert (await module_status(s, t))["ngan_sach"] == "bat"
