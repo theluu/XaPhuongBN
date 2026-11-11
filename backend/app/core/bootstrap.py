@@ -26,6 +26,19 @@ async def ensure_app_role(conn: AsyncConnection) -> None:
         await conn.execute(text(f"ALTER ROLE {APP_ROLE} LOGIN NOSUPERUSER NOBYPASSRLS PASSWORD '{pw}'"))
 
 
+async def protect_audit_log(conn: AsyncConnection) -> None:
+    """Nhật ký chỉ ghi thêm: chặn UPDATE/DELETE/TRUNCATE ở mức CSDL (kể cả với tài khoản chủ sở hữu)."""
+    await conn.execute(text(
+        "CREATE OR REPLACE FUNCTION audit_log_readonly() RETURNS trigger LANGUAGE plpgsql AS "
+        "$$ BEGIN RAISE EXCEPTION 'audit_log chỉ cho phép ghi thêm'; END $$"
+    ))
+    await conn.execute(text("DROP TRIGGER IF EXISTS audit_log_no_change ON audit_log"))
+    await conn.execute(text(
+        "CREATE TRIGGER audit_log_no_change BEFORE UPDATE OR DELETE OR TRUNCATE ON audit_log "
+        "FOR EACH STATEMENT EXECUTE FUNCTION audit_log_readonly()"
+    ))
+
+
 async def apply_security(conn: AsyncConnection) -> None:
     await conn.execute(text(
         "CREATE OR REPLACE FUNCTION app_tenant_ids() RETURNS int[] LANGUAGE sql STABLE AS "
@@ -70,11 +83,28 @@ async def add_missing_columns(conn: AsyncConnection) -> list[str]:
     return added
 
 
+def run_alembic() -> None:
+    import subprocess
+    from pathlib import Path
+
+    r = subprocess.run(["alembic", "upgrade", "head"], cwd=Path(__file__).resolve().parents[2], capture_output=True, text=True)
+    if r.returncode != 0:
+        raise RuntimeError("Nâng cấp CSDL (alembic) thất bại:\n" + r.stderr[-3000:])
+
+
 async def bootstrap() -> None:
+    """Dev/test: create_all + bổ sung cột. Môi trường thật (MIGRATIONS=alembic): nâng cấp có kiểm soát bằng Alembic."""
     import_models()
+    use_alembic = os.environ.get("MIGRATIONS") == "alembic"
     async with engine("admin").begin() as conn:
         await ensure_app_role(conn)
-        await conn.execute(text("CREATE EXTENSION IF NOT EXISTS postgis"))
-        await conn.run_sync(Base.metadata.create_all)
-        await add_missing_columns(conn)
+    if use_alembic:
+        import asyncio
+
+        await asyncio.to_thread(run_alembic)
+    async with engine("admin").begin() as conn:
+        if not use_alembic:
+            await conn.run_sync(Base.metadata.create_all)
+            await add_missing_columns(conn)
+        await protect_audit_log(conn)
         await apply_security(conn)

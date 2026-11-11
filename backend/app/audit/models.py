@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import DDL, DateTime, Integer, String, Text, event, func
+from sqlalchemy import DateTime, Integer, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.core.db import Base
@@ -25,21 +25,3 @@ class AuditLog(Base):
     doi_tuong: Mapped[str | None] = mapped_column(String(200), index=True, nullable=True)
     before: Mapped[dict | None] = mapped_column(JSONType, nullable=True)
     after: Mapped[dict | None] = mapped_column(JSONType, nullable=True)
-
-
-event.listen(
-    AuditLog.__table__,
-    "after_create",
-    DDL(
-        "CREATE OR REPLACE FUNCTION audit_log_readonly() RETURNS trigger LANGUAGE plpgsql AS "
-        "$$ BEGIN RAISE EXCEPTION 'audit_log chỉ cho phép ghi thêm'; END $$"
-    ),
-)
-event.listen(
-    AuditLog.__table__,
-    "after_create",
-    DDL(
-        "CREATE TRIGGER audit_log_no_change BEFORE UPDATE OR DELETE OR TRUNCATE ON audit_log "
-        "FOR EACH STATEMENT EXECUTE FUNCTION audit_log_readonly()"
-    ),
-)

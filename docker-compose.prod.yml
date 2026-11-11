@@ -1,0 +1,14 @@
+# Môi trường thật / staging:  docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+services:
+  db:
+    restart: unless-stopped
+  backend:
+    restart: unless-stopped
+    environment:
+      APP_ENV: production
+      MIGRATIONS: alembic
+      REQUIRE_2FA: "true"
+    command: ["./start.sh", "--workers", "4"]
+  frontend:
+    restart: unless-stopped
+    ports: !override ["127.0.0.1:6680:80"]   # chỉ mở cho reverse proxy (Caddy) trên cùng máy

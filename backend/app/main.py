@@ -31,6 +31,9 @@ from app.sources.router import router as sources_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):  # noqa: ANN201
+    from app.core.config import check_production, get_settings
+
+    check_production(get_settings())
     sch = alert_scheduler.start() if os.environ.get("APP_ENV") != "test" else None
     yield
     if sch:

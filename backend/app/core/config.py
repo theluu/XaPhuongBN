@@ -20,3 +20,16 @@ class Settings(BaseSettings):
 @lru_cache
 def get_settings() -> Settings:
     return Settings()
+
+
+DEV_SECRET = "dev-only-secret-change-me-dev-only-secret-change-me"
+
+
+def check_production(s: Settings) -> None:
+    """Không cho chạy môi trường thật với cấu hình không an toàn."""
+    if s.APP_ENV != "production":
+        return
+    if s.JWT_SECRET == DEV_SECRET or len(s.JWT_SECRET) < 32 or "change-me" in s.JWT_SECRET:
+        raise RuntimeError("JWT_SECRET chưa được đặt giá trị bí mật riêng (≥ 32 ký tự) cho môi trường thật")
+    if not s.REQUIRE_2FA:
+        raise RuntimeError("Môi trường thật phải bật REQUIRE_2FA=true")
