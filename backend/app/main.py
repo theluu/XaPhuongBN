@@ -7,6 +7,7 @@ from app.auth.router import router as auth_router
 from app.core.db import get_session
 from app.budget.router import router as budget_router
 from app.catalog.router import router as catalog_router
+from app.projects.router import router as projects_router
 from app.files.router import router as files_router
 from app.indicators.router import router as indicators_router
 from app.indicators.workflow import router as workflow_router
@@ -36,4 +37,5 @@ def create_app() -> FastAPI:
     app.include_router(files_router)
     app.include_router(catalog_router)
     app.include_router(budget_router)
+    app.include_router(projects_router)
     return app
