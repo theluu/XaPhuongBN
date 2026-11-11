@@ -90,7 +90,7 @@ async def series(ma: str, tu: str, den: str, s: AsyncSession = Depends(tenant_db
     while p >= start and len(out) < 240:
         v, state, _ = _resolve(ind, await _rows(s, ind.id, str(p), ind.scope))
         out.append({"ky": str(p), "gia_tri": num(v.gia_tri) if v else None, "data_state": state,
-                    "ke_hoach": num(await plan_for(s, ind.id, str(p)))})
+                    "ke_hoach": num(await plan_for(s, ind.id, str(p), ind.luy_ke))})
         p = prev(p)
     return list(reversed(out))
 

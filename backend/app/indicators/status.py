@@ -30,6 +30,8 @@ def evaluate(ind: Any, value: Decimal | None, plan: Decimal | None, nam: int | N
     if value is None:
         return MISSING
     value = Decimal(value)
+    if ind.chieu == "theo_doi":
+        return Evaluation("theo_doi", None)
     if ind.chieu == "tang_tot":
         if plan is None:
             return MISSING

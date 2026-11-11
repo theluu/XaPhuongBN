@@ -31,6 +31,14 @@ def align(p: Period, loai: str) -> Period:
     return Period(y, "tuan", w)
 
 
+def effective(req: Period, loai: str) -> Period:
+    """Kỳ gần nhất của chỉ tiêu đã kết thúc trước (hoặc cùng) kỳ yêu cầu."""
+    p = align(req, loai)
+    while p.ket_thuc > req.ket_thuc:
+        p = prev(p)
+    return p
+
+
 async def _rows(s: AsyncSession, indicator_id: int, ky: str, scope: str | None = None) -> list[IndicatorValue]:
     q = select(IndicatorValue).where(
         IndicatorValue.indicator_id == indicator_id, IndicatorValue.ky_bao_cao == ky, IndicatorValue.tdp_id.is_(None)
@@ -77,10 +85,14 @@ async def source_diff(s: AsyncSession, indicator_id: int, ky: str) -> dict | Non
     return _diff(await _rows(s, indicator_id, ky))
 
 
-async def plan_for(s: AsyncSession, indicator_id: int, ky: str) -> Decimal | None:
-    return (await s.execute(
-        select(IndicatorPlan.gia_tri_ke_hoach).where(IndicatorPlan.indicator_id == indicator_id, IndicatorPlan.ky == ky)
-    )).scalar()
+async def plan_for(s: AsyncSession, indicator_id: int, ky: str, luy_ke: bool = True) -> Decimal | None:
+    """Kế hoạch đúng kỳ. Chỉ tiêu dạng mức (không lũy kế) được so với kế hoạch năm cùng năm;
+    chỉ tiêu lũy kế không bao giờ chia kế hoạch năm theo tháng (DT IV.2)."""
+    q = select(IndicatorPlan.gia_tri_ke_hoach).where(IndicatorPlan.indicator_id == indicator_id)
+    exact = (await s.execute(q.where(IndicatorPlan.ky == ky))).scalar()
+    if exact is not None or luy_ke or len(ky) == 4:
+        return exact
+    return (await s.execute(q.where(IndicatorPlan.ky == ky[:4]))).scalar()
 
 
 async def _simple(s: AsyncSession, ind: Indicator, ky: str) -> float | None:
@@ -89,11 +101,11 @@ async def _simple(s: AsyncSession, ind: Indicator, ky: str) -> float | None:
 
 
 async def card(s: AsyncSession, ind: Indicator, ky_req: str) -> dict:
-    p = align(parse_ky(ky_req), ind.ky_cap_nhat)
+    p = effective(parse_ky(ky_req), ind.ky_cap_nhat)
     ky = str(p)
     rows = await _rows(s, ind.id, ky, ind.scope)
     v, state, newer = _resolve(ind, rows)
-    plan = await plan_for(s, ind.id, ky)
+    plan = await plan_for(s, ind.id, ky, ind.luy_ke)
     ev = evaluate(ind, v.gia_tri if v else None, plan, nam=p.nam)
     d = _diff(rows)
     kt, ck = prev(p), same_period_last_year(p)
@@ -120,7 +132,7 @@ async def completeness(s: AsyncSession, tenant_id: int, nhom: str, ky_req: str) 
     inds = list((await s.execute(select(Indicator).where(Indicator.tenant_id == tenant_id, Indicator.nhom == nhom))).scalars())
     co_so = xac_nhan = 0
     for ind in inds:
-        ky = str(align(parse_ky(ky_req), ind.ky_cap_nhat))
+        ky = str(effective(parse_ky(ky_req), ind.ky_cap_nhat))
         rows = [r for r in await _rows(s, ind.id, ky) if r.trang_thai != "tu_choi" and r.gia_tri is not None]
         co_so += bool(rows)
         xac_nhan += any(r.trang_thai == "da_xac_nhan" for r in rows)

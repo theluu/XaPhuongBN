@@ -160,3 +160,30 @@ async def test_series_keeps_nulls(client):
     r = await client.get("/api/indicators/SR-1/series", params={"tu": "2026-08", "den": "2026-10"},
                          headers=bearer(await login(client, u["username"])))
     assert [(x["ky"], x["gia_tri"]) for x in r.json()] == [("2026-08", 5), ("2026-09", None), ("2026-10", 7)]
+
+
+async def test_effective_period_uses_latest_finished_period(client):
+    t = await make_tenant()
+    iq = await make_indicator(t, ma_chi_tieu="Q-1", ky_cap_nhat="quy")
+    iy = await make_indicator(t, ma_chi_tieu="Y-1", ky_cap_nhat="nam")
+    await add_value(t, iq, "2026-Q3", 7)
+    await add_value(t, iy, "2025", 9)
+    u = await make_user(t)
+    cards = await _cards(client, await login(client, u["username"]), ky="2026-10")
+    assert cards["Q-1"]["ky"] == "2026-Q3" and cards["Q-1"]["thuc_hien"] == 7
+    assert cards["Y-1"]["ky"] == "2025" and cards["Y-1"]["thuc_hien"] == 9
+    cards = await _cards(client, await login(client, u["username"]), ky="2026-12")
+    assert cards["Q-1"]["ky"] == "2026-Q4" and cards["Y-1"]["ky"] == "2026"
+
+
+async def test_level_indicator_uses_annual_plan_but_cumulative_does_not(client):
+    t = await make_tenant()
+    lv = await make_indicator(t, ma_chi_tieu="LV-1", ky_cap_nhat="thang")
+    cu = await make_indicator(t, ma_chi_tieu="CU-1", ky_cap_nhat="thang", luy_ke=True)
+    for i in (lv, cu):
+        await add_plan(t, i, "2026", 98)
+        await add_value(t, i, "2026-10", 99)
+    u = await make_user(t)
+    cards = await _cards(client, await login(client, u["username"]), ky="2026-10")
+    assert cards["LV-1"]["ke_hoach"] == 98 and cards["LV-1"]["status"] == "dat"
+    assert cards["CU-1"]["ke_hoach"] is None and cards["CU-1"]["status"] == "chua_du_du_lieu"

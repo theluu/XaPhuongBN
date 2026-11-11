@@ -68,3 +68,9 @@ def test_compare_prev_and_same_period():
     assert str(prev(parse_ky("2026-W01"))) == "2025-W52"
     with pytest.raises(ValueError):
         parse_ky("2026-13")
+
+
+def test_theo_doi_has_no_target_status():
+    e = evaluate(ind("theo_doi"), D(5230), None)
+    assert e.status == "theo_doi" and e.hoan_thanh_pct is None
+    assert evaluate(ind("theo_doi"), None, None).status == "chua_du_du_lieu"

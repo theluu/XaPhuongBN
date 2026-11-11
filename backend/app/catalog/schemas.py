@@ -3,7 +3,7 @@ from typing import Literal
 
 from pydantic import BaseModel, field_validator, model_validator
 
-Chieu = Literal["tang_tot", "giam_tot", "dat_nguong"]
+Chieu = Literal["tang_tot", "giam_tot", "dat_nguong", "theo_doi"]
 Ky = Literal["tuan", "thang", "quy", "nam", "api", "ky_bao_cao"]
 REQUIRED_TEXT = ["ma_chi_tieu", "ten", "dinh_nghia", "cong_thuc", "pham_vi_dia_ban", "don_vi_do", "nguon_mac_dinh", "don_vi_chu_quan"]
 
@@ -27,6 +27,7 @@ class IndicatorIn(BaseModel):
     muc_tieu_2030: Decimal | None = None
     han_muc_tieu_nam: int | None = None
     scope: Literal["dia_ban", "ns_phuong"] | None = None
+    luy_ke: bool = False  # số lũy kế: chỉ so với kế hoạch đúng kỳ, không lấy kế hoạch năm
     nguon_mac_dinh: str
     nguon_uu_tien: list[str] = ["phuong", "chuyen_nganh", "api"]
     don_vi_chu_quan: str

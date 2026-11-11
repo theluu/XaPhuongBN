@@ -35,6 +35,7 @@ class Indicator(PackTracked, Base):
     muc_tieu_2030: Mapped[Decimal | None] = mapped_column(Numeric(20, 4), nullable=True)
     han_muc_tieu_nam: Mapped[int | None] = mapped_column(Integer, nullable=True)
     scope: Mapped[str | None] = mapped_column(String(20), nullable=True)
+    luy_ke: Mapped[bool] = mapped_column(Boolean, default=False)
     nguon_mac_dinh: Mapped[str] = mapped_column(String(300))
     nguon_uu_tien: Mapped[list] = mapped_column(JSONType, default=lambda: ["phuong", "chuyen_nganh", "api"])
     don_vi_chu_quan: Mapped[str] = mapped_column(String(300))
