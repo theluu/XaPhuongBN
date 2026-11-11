@@ -1,3 +1,6 @@
+import os
+from contextlib import asynccontextmanager
+
 from fastapi import Depends, FastAPI
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -12,6 +15,8 @@ from app.works.router import router as works_router
 from app.services_pakn.router import router as services_router
 from app.population.router import router as population_router
 from app.quality_of_life.router import router as qol_router
+from app.alerts.router import router as alerts_router
+from app.alerts import scheduler as alert_scheduler
 from app.files.router import router as files_router
 from app.indicators.router import router as indicators_router
 from app.indicators.workflow import router as workflow_router
@@ -19,8 +24,17 @@ from app.platform.router import router as platform_router
 from app.sources.router import router as sources_router
 
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):  # noqa: ANN201
+    sch = alert_scheduler.start() if os.environ.get("APP_ENV") != "test" else None
+    yield
+    if sch:
+        sch.shutdown(wait=False)
+
+
 def create_app() -> FastAPI:
     app = FastAPI(
+        lifespan=lifespan,
         title="IOC-XP — Nền tảng điều hành số xã/phường",
         docs_url="/api/docs",
         openapi_url="/api/openapi.json",
@@ -46,4 +60,5 @@ def create_app() -> FastAPI:
     app.include_router(services_router)
     app.include_router(population_router)
     app.include_router(qol_router)
+    app.include_router(alerts_router)
     return app

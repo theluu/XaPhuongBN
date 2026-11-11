@@ -105,6 +105,36 @@ async def _seed_sample(s, tenant_id: int, users: dict[str, int]) -> None:  # noq
     for mod in _sample_modules():
         await mod.seed(s, tenant_id, users)
     await s.commit()
+    await _sample_alerts(tenant_id, users)
+
+
+async def _sample_alerts(tenant_id: int, users: dict[str, int]) -> None:
+    """Chạy quy tắc cảnh báo trên dữ liệu minh họa và giao sẵn 2 hồ sơ theo dõi để demo luồng chỉ đạo."""
+    from datetime import date, timedelta
+
+    from app.alerts.engine import run_rules
+    from app.alerts.models import Alert, FollowUpCase
+    from app.core.db import tenant_session
+
+    async with tenant_session([tenant_id]) as ts:
+        alerts = await run_rules(ts, tenant_id)
+        for a in alerts:
+            a.is_sample = True
+        await ts.flush()
+        today = date.today()
+        picks = {a.rule_ma: a for a in alerts}
+        for ma, co_quan, nguoi, tt, nn, hd in [
+            ("NS_THU_NGUY_CO_KY", "Bộ phận Tài chính – Kế toán", "Phạm Thu Dung", "dang_xu_ly",
+             "Phiên đấu giá quyền sử dụng đất quý III lùi sang tháng 12", "Phối hợp Trung tâm Phát triển quỹ đất đẩy nhanh hồ sơ đấu giá"),
+            ("DA_QUA_HAN_MOC", "Ban quản lý dự án phường", "Hoàng Văn Đức", "da_giao", "", ""),
+        ]:
+            a = picks.get(ma)
+            if a:
+                a.trang_thai = tt
+                ts.add(FollowUpCase(tenant_id=tenant_id, alert_id=a.id, co_quan_xu_ly=co_quan, nguoi_phu_trach=nguoi, han=today + timedelta(days=5),
+                                    chi_dao="Báo cáo nguyên nhân và giải pháp tại giao ban tuần", trang_thai=tt, nguyen_nhan=nn, hanh_dong=hd,
+                                    nguoi_giao_id=users.get("chutich") or 0, lich_su=[], is_sample=True))
+        await ts.commit()
 
 
 def _sample_modules() -> list:

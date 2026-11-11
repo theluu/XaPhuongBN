@@ -6,6 +6,7 @@ from sqlalchemy import text
 from sqlalchemy.ext.asyncio import create_async_engine
 
 TEST_DB = "ioc_test"
+os.environ["APP_ENV"] = "test"
 
 
 def _with_db(url: str, db: str) -> str:
