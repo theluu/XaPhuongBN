@@ -5,6 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.audit.middleware import AuditMiddleware
 from app.auth.router import router as auth_router
 from app.core.db import get_session
+from app.sources.router import router as sources_router
 
 
 def create_app() -> FastAPI:
@@ -22,4 +23,5 @@ def create_app() -> FastAPI:
         return {"status": "ok", "db": "ok"}
 
     app.include_router(auth_router)
+    app.include_router(sources_router)
     return app
