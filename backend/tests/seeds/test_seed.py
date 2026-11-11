@@ -77,3 +77,13 @@ async def test_purge_sample_data():
         assert (await s.get(Tenant, t)) is not None
     assert len(await _inds(t)) >= 23
     await seed_tenant("viet_yen", with_sample=True)  # khôi phục cho test khác
+
+
+async def test_catalog_names_with_commas_kept():
+    from app.platform.models import SharedCatalog
+
+    await seed_platform()
+    async with admin_sessionmaker()() as s:
+        names = {c.ma: c.ten for c in (await s.execute(select(SharedCatalog))).scalars()}
+    assert names["LE_PHI"] == "Phí, lệ phí" and names["NV_HATANG"] == "Đầu tư, duy tu hạ tầng đô thị"
+    assert names["ha_tang"] == "Hạ tầng giao thông, chiếu sáng"

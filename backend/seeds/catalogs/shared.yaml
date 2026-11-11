@@ -1,47 +1,47 @@
 # Danh mục dùng chung do nền tảng quản lý — một nơi sửa, mọi đơn vị dùng
 nguon_von:
-  - {ma: NSTW, ten: Ngân sách trung ương}
-  - {ma: NSDP_TINH, ten: Ngân sách tỉnh}
-  - {ma: NS_PHUONG, ten: Ngân sách phường}
-  - {ma: XHH, ten: Xã hội hóa}
-  - {ma: ODA, ten: Vốn ODA}
+  - {ma: NSTW, ten: "Ngân sách trung ương"}
+  - {ma: NSDP_TINH, ten: "Ngân sách tỉnh"}
+  - {ma: NS_PHUONG, ten: "Ngân sách phường"}
+  - {ma: XHH, ten: "Xã hội hóa"}
+  - {ma: ODA, ten: "Vốn ODA"}
 nhom_thu:
-  - {ma: THUE_CTN, ten: Thuế công thương nghiệp ngoài quốc doanh}
-  - {ma: LE_PHI, ten: Phí, lệ phí}
-  - {ma: TIEN_SDD, ten: Tiền sử dụng đất}
-  - {ma: THUE_SDD_PNN, ten: Thuế sử dụng đất phi nông nghiệp}
-  - {ma: THUE_TNCN, ten: Thuế thu nhập cá nhân}
-  - {ma: THU_KHAC, ten: Thu khác ngân sách}
+  - {ma: THUE_CTN, ten: "Thuế công thương nghiệp ngoài quốc doanh"}
+  - {ma: LE_PHI, ten: "Phí, lệ phí"}
+  - {ma: TIEN_SDD, ten: "Tiền sử dụng đất"}
+  - {ma: THUE_SDD_PNN, ten: "Thuế sử dụng đất phi nông nghiệp"}
+  - {ma: THUE_TNCN, ten: "Thuế thu nhập cá nhân"}
+  - {ma: THU_KHAC, ten: "Thu khác ngân sách"}
 nhom_chi:
-  - {ma: CHI_DTPT, ten: Chi đầu tư phát triển}
-  - {ma: CHI_QLHC, ten: Chi quản lý hành chính}
-  - {ma: CHI_SN_GD, ten: Chi sự nghiệp giáo dục}
-  - {ma: CHI_SN_MT, ten: Chi sự nghiệp môi trường}
-  - {ma: CHI_DBXH, ten: Chi đảm bảo xã hội}
+  - {ma: CHI_DTPT, ten: "Chi đầu tư phát triển"}
+  - {ma: CHI_QLHC, ten: "Chi quản lý hành chính"}
+  - {ma: CHI_SN_GD, ten: "Chi sự nghiệp giáo dục"}
+  - {ma: CHI_SN_MT, ten: "Chi sự nghiệp môi trường"}
+  - {ma: CHI_DBXH, ten: "Chi đảm bảo xã hội"}
 nhiem_vu_chi:
-  - {ma: NV_HATANG, ten: Đầu tư, duy tu hạ tầng đô thị}
-  - {ma: NV_BMAY, ten: Hoạt động bộ máy}
-  - {ma: NV_GIAODUC, ten: Giáo dục, đào tạo}
-  - {ma: NV_MOITRUONG, ten: Vệ sinh môi trường}
-  - {ma: NV_ANSINH, ten: An sinh xã hội}
-  - {ma: NV_QPAN, ten: Quốc phòng, an ninh}
+  - {ma: NV_HATANG, ten: "Đầu tư, duy tu hạ tầng đô thị"}
+  - {ma: NV_BMAY, ten: "Hoạt động bộ máy"}
+  - {ma: NV_GIAODUC, ten: "Giáo dục, đào tạo"}
+  - {ma: NV_MOITRUONG, ten: "Vệ sinh môi trường"}
+  - {ma: NV_ANSINH, ten: "An sinh xã hội"}
+  - {ma: NV_QPAN, ten: "Quốc phòng, an ninh"}
 linh_vuc_tthc:
-  - {ma: HOTICH, ten: Hộ tịch}
-  - {ma: CHUNGTHUC, ten: Chứng thực}
-  - {ma: DATDAI, ten: Đất đai}
-  - {ma: XAYDUNG, ten: Xây dựng}
-  - {ma: KINHDOANH, ten: Hộ kinh doanh}
-  - {ma: LAODONG, ten: Lao động – thương binh – xã hội}
+  - {ma: HOTICH, ten: "Hộ tịch"}
+  - {ma: CHUNGTHUC, ten: "Chứng thực"}
+  - {ma: DATDAI, ten: "Đất đai"}
+  - {ma: XAYDUNG, ten: "Xây dựng"}
+  - {ma: KINHDOANH, ten: "Hộ kinh doanh"}
+  - {ma: LAODONG, ten: "Lao động – thương binh – xã hội"}
 # Hạn xử lý phản ánh theo loại việc (ngày làm việc) — đơn vị cấu hình lại theo quy định áp dụng
 loai_pakn:
-  - {ma: moi_truong, ten: Vệ sinh môi trường, thuoc_tinh: {han_xu_ly_ngay: 5}}
-  - {ma: trat_tu_do_thi, ten: Trật tự đô thị, thuoc_tinh: {han_xu_ly_ngay: 7}}
-  - {ma: ha_tang, ten: Hạ tầng giao thông, chiếu sáng, thuoc_tinh: {han_xu_ly_ngay: 10}}
-  - {ma: an_ninh, ten: An ninh trật tự, thuoc_tinh: {han_xu_ly_ngay: 3}}
-  - {ma: dat_dai, ten: Đất đai, xây dựng, thuoc_tinh: {han_xu_ly_ngay: 15}}
+  - {ma: moi_truong, ten: "Vệ sinh môi trường", thuoc_tinh: {han_xu_ly_ngay: 5}}
+  - {ma: trat_tu_do_thi, ten: "Trật tự đô thị", thuoc_tinh: {han_xu_ly_ngay: 7}}
+  - {ma: ha_tang, ten: "Hạ tầng giao thông, chiếu sáng", thuoc_tinh: {han_xu_ly_ngay: 10}}
+  - {ma: an_ninh, ten: "An ninh trật tự", thuoc_tinh: {han_xu_ly_ngay: 3}}
+  - {ma: dat_dai, ten: "Đất đai, xây dựng", thuoc_tinh: {han_xu_ly_ngay: 15}}
 loai_cong_trinh:
-  - {ma: GIAO_THONG, ten: Giao thông}
-  - {ma: TRUONG_HOC, ten: Trường học}
-  - {ma: CHINH_TRANG, ten: Chỉnh trang đô thị}
-  - {ma: THOAT_NUOC, ten: Thoát nước}
-  - {ma: CONG_CONG, ten: Công trình công cộng}
+  - {ma: GIAO_THONG, ten: "Giao thông"}
+  - {ma: TRUONG_HOC, ten: "Trường học"}
+  - {ma: CHINH_TRANG, ten: "Chỉnh trang đô thị"}
+  - {ma: THOAT_NUOC, ten: "Thoát nước"}
+  - {ma: CONG_CONG, ten: "Công trình công cộng"}
