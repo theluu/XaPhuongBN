@@ -60,6 +60,8 @@ export interface Me {
   don_vi: string;
   tenant_id: number | null;
   phai_doi_mat_khau: boolean;
+  /** Quản trị nền tảng đang vào quản trị nội dung của một xã/phường */
+  dai_dien?: boolean;
   roles: string[];
   quyen: Record<string, string[]>;
 }

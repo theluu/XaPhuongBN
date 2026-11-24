@@ -61,6 +61,7 @@ class IndicatorPlan(Base):
     ky: Mapped[str] = mapped_column(String(10))  # "2026" | "2026-Q3" | "2026-10" | "2026-W40"
     gia_tri_ke_hoach: Mapped[Decimal] = mapped_column(Numeric(20, 4))
     can_cu: Mapped[str] = mapped_column(String(300), default="")
+    is_sample: Mapped[bool] = mapped_column(Boolean, default=False, index=True)
 
 
 class Program(PackTracked, Base):

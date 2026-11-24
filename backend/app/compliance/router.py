@@ -26,10 +26,17 @@ async def compliance(tu: date = Query(default_factory=lambda: date.today() - tim
 
 @router.get("/reminders")
 async def my_reminders(s: AsyncSession = Depends(tenant_db), user: CurrentUser = Depends(get_current_user)) -> list:
+    from app.dau_moi.service import lookup
+
     groups = {g for g, q in user.permissions.items() if "nhap" in q}
     if not groups:
         return []
-    return jsonable(await reminders(s, s.info["tenant_id"], date.today(), groups))
+    mine = {d.ma for d in (await lookup(s, s.info["tenant_id"])).cua_user(user.id)}
+    out = await reminders(s, s.info["tenant_id"], date.today(), groups)
+    for r in out:
+        r["cua_dau_moi_toi"] = any(d["ma"] in mine for d in r["dau_moi"])
+    # Mục thuộc đầu mối của chính người dùng lên trước
+    return jsonable(sorted(out, key=lambda r: (not r["cua_dau_moi_toi"], r["con_lai_ngay"])))
 
 
 class MemoIn(BaseModel):

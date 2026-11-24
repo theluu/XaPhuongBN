@@ -12,7 +12,10 @@ def parse_vn_number(v: object) -> Decimal | None:
     if isinstance(v, bool):
         raise ValueError("Không phải số")
     if isinstance(v, int | float | Decimal):
-        return Decimal(str(v))
+        d = Decimal(str(v))
+        if not d.is_finite():
+            raise ValueError(f"'{v}' không phải là số hợp lệ")
+        return d
     s = str(v).strip().replace(" ", "").replace(" ", "")
     if s in EMPTY:
         return None
@@ -22,6 +25,8 @@ def parse_vn_number(v: object) -> Decimal | None:
         s = s.replace(",", ".")
     elif re.fullmatch(r"-?\d{1,3}(\.\d{3})+", s):
         s = s.replace(".", "")
+    if not re.fullmatch(r"-?\d+(\.\d+)?", s):
+        raise ValueError(f"'{v}' không phải là số")
     try:
         return Decimal(s)
     except InvalidOperation as e:

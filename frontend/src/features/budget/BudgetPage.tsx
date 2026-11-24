@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { NguonTrachNhiem } from "@/features/org/DauMoi";
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { api } from "@/lib/api";
 import { formatDate, formatMoney, formatNumber, formatPeriod } from "@/lib/format";
@@ -21,7 +22,7 @@ const SCOPE: Record<string, string> = { dia_ban: "Trên địa bàn", ns_phuong:
 function RevenueBlock({ title, t, note }: { title: string; t: Totals; note: string }) {
   return (
     <section aria-label={title} className="khu rounded-md p-4">
-      <h2 className="text-[16px] font-semibold">{title}</h2>
+      <h2 className="the-tieu-de">{title}</h2>
       <p className="mb-3 text-[13px] text-muc-nhat">{note}</p>
       <div className="flex items-baseline gap-2">
         <span className="font-so text-[44px] font-semibold leading-none tabular">{formatMoney(t.thuc_hien)}</span>
@@ -45,6 +46,7 @@ export function BudgetPage() {
   return (
     <>
       <PageHeader title="Thu – chi ngân sách" desc={`Số liệu lũy kế đến hết ${formatPeriod(ky)}. Thu trên địa bàn và thu ngân sách phường được hưởng là hai phạm vi khác nhau, không cộng gộp.`} />
+      <div className="mb-4"><NguonTrachNhiem nhom="ngan_sach" /></div>
       {!d ? <p className="text-muc-nhat">Đang tải…</p> : (
         <div className="space-y-4">
           {d.cho_doi_soat && (
@@ -58,7 +60,7 @@ export function BudgetPage() {
           </div>
 
           <section className="khu rounded-md p-4">
-            <h2 className="mb-2 text-[16px] font-semibold">Diễn biến thu lũy kế theo tháng</h2>
+            <h2 className="mb-2 the-tieu-de">Diễn biến thu lũy kế theo tháng</h2>
             <ResponsiveContainer width="100%" height={240}>
               <LineChart data={d.xu_huong_thang.map((x) => ({ ...x, a: x.thu_dia_ban && x.thu_dia_ban / 1e9, b: x.thu_ns_phuong && x.thu_ns_phuong / 1e9, k: x.ke_hoach_thu_dia_ban && x.ke_hoach_thu_dia_ban / 1e9 }))}
                 margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>

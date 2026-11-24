@@ -11,4 +11,6 @@ services:
     command: ["./start.sh", "--workers", "4"]
   frontend:
     restart: unless-stopped
+    environment:
+      TRUSTED_PROXY: "10.89.0.1/32"   # Caddy trên máy chủ đi vào qua gateway của mạng internal
     ports: !override ["127.0.0.1:6680:80"]   # chỉ mở cho reverse proxy (Caddy) trên cùng máy

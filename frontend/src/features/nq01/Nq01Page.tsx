@@ -1,4 +1,5 @@
 import * as Tabs from "@radix-ui/react-tabs";
+import { NguonTrachNhiem } from "@/features/org/DauMoi";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
@@ -47,6 +48,7 @@ export function Nq01Page() {
     <>
       <PageHeader title="Chỉ tiêu kinh tế – xã hội và Nghị quyết Đại hội"
         desc="16 chỉ tiêu chủ yếu đến năm 2030 của Nghị quyết 01-NQ/ĐU. Mỗi ô hiển thị số của kỳ báo cáo gần nhất đã kết thúc; dấu tròn cho biết số đã được xác nhận hay chưa." />
+      <div className="mb-4"><NguonTrachNhiem nhom="ktxh" /></div>
       <div className="grid gap-5 xl:grid-cols-[1fr_340px]">
         <Tabs.Root value={tab} onValueChange={(v) => setTab(v as typeof tab)}>
           <Tabs.List aria-label="Lọc theo trạng thái" className="mb-4 flex flex-wrap gap-1 border-b border-vien">
@@ -75,7 +77,7 @@ export function Nq01Page() {
           </div>
         </Tabs.Root>
         <aside className="khu h-fit rounded-md border-t-[3px] border-t-son p-4">
-          <h2 className="text-[16px] font-semibold">Cần đôn đốc</h2>
+          <h2 className="the-tieu-de">Cần đôn đốc</h2>
           <p className="mb-3 text-[13px] text-muc-nhat">Chỉ tiêu có nguy cơ, thiếu số liệu hoặc số chưa được xác nhận.</p>
           <ul aria-label="Chỉ tiêu cần đôn đốc" className="divide-y divide-[var(--vien)]">
             {urge.map((c) => (

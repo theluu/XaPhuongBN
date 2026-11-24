@@ -1,9 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
+import { Link } from "react-router-dom";
 import { api } from "@/lib/api";
 import { formatDate } from "@/lib/format";
 import { PageHeader } from "@/components/PageHeader";
 
-interface Src { id: number; ma: string; ten: string; loai: string; co_quan_cung_cap: string; nhom_du_lieu: string; trang_thai: string; phap_ly_chia_se: string;
+interface Src { dau_moi?: { ma: string; ten: string }[]; id: number; ma: string; ten: string; loai: string; co_quan_cung_cap: string; nhom_du_lieu: string; trang_thai: string; phap_ly_chia_se: string;
   dung_chung: boolean; lan_dong_bo_cuoi: string | null; tong_api: number; so_api_ket_noi: number; so_api_tra_du_lieu: number;
   endpoints: { ma: string; ten: string; ket_noi: boolean; tra_du_lieu: boolean }[]; ghi_chu: string }
 
@@ -25,7 +26,8 @@ export function SourcesPage() {
           return (
             <article key={s.id} className="khu rounded-md p-4">
               <div className="flex items-start gap-3">
-                <div className="flex-1"><h2 className="font-semibold leading-snug">{s.ten}</h2><p className="text-[13px] text-muc-nhat">{s.co_quan_cung_cap}. {PL[s.phap_ly_chia_se]}{s.dung_chung ? ". Nguồn dùng chung của nền tảng" : ""}</p></div>
+                <div className="flex-1"><h2 className="font-semibold leading-snug">{s.ten}</h2><p className="text-[13px] text-muc-nhat">{s.co_quan_cung_cap}. {PL[s.phap_ly_chia_se]}{s.dung_chung ? ". Nguồn dùng chung của nền tảng" : ""}</p>
+                  {!!s.dau_moi?.length && <p className="text-[13px]">Đầu mối chịu trách nhiệm: {s.dau_moi.map((m, i) => <span key={m.ma}>{i > 0 && ", "}<Link className="lien-ket" to={`/co-cau-to-chuc?tab=dau-moi#dm-${m.ma}`}>{m.ten}</Link></span>)}</p>}</div>
                 <span className="shrink-0 text-[13.5px] font-medium" style={{ color }}>{label}</span>
               </div>
               {s.tong_api > 0 && <p className="mt-2 text-[14.5px]">{s.so_api_ket_noi}/{s.tong_api} API đã kết nối, {s.so_api_tra_du_lieu} API đang trả dữ liệu</p>}

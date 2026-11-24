@@ -8,6 +8,9 @@ Tài liệu: [Tổng quan](docs/01_Tong_quan.md) · [Kiến trúc](docs/04_Kien_
 cp .env.example .env              # đổi toàn bộ mật khẩu, bí mật
 ./scripts/deploy.sh local         # kiểm thử → build → seed
 # http://localhost:6680  — tài khoản demo: chutich / canbo1 / xacnhan / qtphuong / nentang (mật khẩu = SEED_PASSWORD)
+#   Phường thứ hai (Nếnh): nenh.chutich / nenh.canbo1 / nenh.xacnhan / nenh.qtphuong / nenh.xem — cùng mật khẩu
+#   Cơ quan ngoài phường (vai trò Cơ quan chuyên ngành): sotaichinh, khobac, thue, congan, soxaydung, banqlda, sogddt, bhxh, moitruong, thongke (Nếnh: thêm tiền tố nenh.)
+#   nentang → Quản trị: quản lý mọi xã/phường, tài khoản, dữ liệu minh họa; "Vào quản trị nội dung" để sửa dữ liệu từng phường
 ```
 
 ## Kiểm thử

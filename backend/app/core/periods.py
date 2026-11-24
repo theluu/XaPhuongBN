@@ -4,6 +4,10 @@ from dataclasses import dataclass
 from datetime import date, timedelta
 
 
+class KyError(ValueError):
+    """Kỳ báo cáo không hợp lệ (trả 422 cho người dùng)."""
+
+
 @dataclass(frozen=True, order=True)
 class Period:
     nam: int
@@ -41,7 +45,7 @@ def parse_ky(s: str) -> Period:
     if m := re.fullmatch(r"(\d{4})-W(\d{2})", s):
         if 1 <= int(m[2]) <= _weeks(int(m[1])):
             return Period(int(m[1]), "tuan", int(m[2]))
-    raise ValueError(f"Kỳ báo cáo không hợp lệ: {s}")
+    raise KyError(f"Kỳ báo cáo không hợp lệ: {s}")
 
 
 def prev(p: Period) -> Period:

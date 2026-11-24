@@ -38,3 +38,32 @@ Triển khai tại Trung tâm dữ liệu không có Internet: cấu hình nền
 
 ## Kiểm tra sức khỏe
 `curl -fsS http://127.0.0.1:6680/api/health` → `{"status":"ok","db":"ok"}`.
+
+## Chống spam đăng nhập (reCAPTCHA)
+- Tạo khóa **reCAPTCHA v2 – hộp kiểm "Tôi không phải người máy"** tại https://www.google.com/recaptcha/admin, khai báo tên miền của hệ thống.
+- Đặt trong `.env`: `RECAPTCHA_SITE_KEY`, `RECAPTCHA_SECRET`, tùy chọn `RECAPTCHA_HOSTNAMES=dieuhanh.example.gov.vn` (chỉ chấp nhận mã sinh ra từ tên miền này). Khởi động lại backend.
+- Để trống cả hai khóa thì tắt (VD mạng nội bộ không có Internet); vẫn còn khóa tài khoản sau 5 lần sai.
+- Lỗi xác minh không tính vào số lần sai mật khẩu; mọi lần đăng nhập (kể cả bị chặn) đều ghi nhật ký.
+
+## Màn hình TV phòng điều hành
+- Tạo tài khoản vai trò **Màn hình TV phòng điều hành**; đăng nhập trên TV sẽ vào thẳng `/man-hinh-tv` (bản đồ, 3–5 việc nổi bật, giờ cập nhật, tự làm mới 60 giây). Không bao giờ hiện thông tin người gửi phản ánh.
+
+## Máy chủ dùng chung (không Docker) — bacninh.aionlinetest.com
+
+Bản staging chạy trực tiếp trên máy chủ dùng chung với các ứng dụng khác (Ubuntu 22.04, nginx, PostgreSQL 14):
+
+| Thành phần | Vị trí |
+|---|---|
+| Mã nguồn backend | `/opt/ioc-xp/app` (Python 3.12, venv `/opt/ioc-xp/venv`) |
+| Giao diện (bản build) | `/opt/ioc-xp/web` |
+| Tệp tải lên | `/opt/ioc-xp/storage` |
+| Bí mật, cấu hình | `/opt/ioc-xp/.env` (root:iocxp, 640) — mật khẩu CSDL, JWT, mật khẩu tài khoản demo (`SEED_PASSWORD`) |
+| Dịch vụ | `systemctl status ioc-xp` (người dùng `iocxp`, 127.0.0.1:8090, 2 worker); nhật ký `journalctl -u ioc-xp` |
+| CSDL | `ioc_xp` trên PostgreSQL 14 của máy; chủ sở hữu `ioc_xp_owner` (không CREATEROLE), ứng dụng `ioc_app` (chịu RLS); `APP_ROLE_EXTERNAL=1` |
+| nginx | `/etc/nginx/sites-available/bacninh.aionlinetest.com`; nhật ký `/var/log/nginx/ioc-xp.*.log` |
+| HTTPS | Let's Encrypt, gia hạn tự động kiểu webroot (`/var/www/html`), hook nạp lại nginx |
+
+Cập nhật phiên bản: `./scripts/deploy-server.sh root@45.118.145.203` (kiểm thử → build → sao lưu `pg_dump` vào `/opt/ioc-xp/backup`, giữ 7 bản → chép mã → cài thư viện → khởi động lại; Alembic chạy khi dịch vụ khởi động).
+
+Bật reCAPTCHA: thêm `RECAPTCHA_SITE_KEY`, `RECAPTCHA_SECRET` (khóa v2 cho tên miền `bacninh.aionlinetest.com`) vào `/opt/ioc-xp/.env`, rồi `systemctl restart ioc-xp`.
+Trước khi dùng thật: đặt `APP_ENV=production`, `REQUIRE_2FA=true`, xóa dữ liệu minh họa, đổi mật khẩu tài khoản demo.

@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { NguonTrachNhiem } from "@/features/org/DauMoi";
 import { useState } from "react";
 import { api } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
@@ -21,6 +22,7 @@ export function QualityOfLifePage() {
   return (
     <>
       <PageHeader title="Giáo dục, y tế, môi trường và chất lượng sống" desc="Mục tiêu hằng năm và đến 2030. Chỉ chia sẻ số liệu y tế tổng hợp; lớp bản đồ chỉ hiển thị điểm được phép và đạt chất lượng dữ liệu." />
+      <div className="mb-4"><NguonTrachNhiem nhom="gd_yt_mt" /></div>
       <div className="space-y-5">
         {GROUPS.map(([k, t]) => (q.data?.[k] ?? []).length > 0 && (
           <section key={k}>

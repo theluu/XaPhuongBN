@@ -69,7 +69,7 @@ async def minutes(body: MinutesIn, s: AsyncSession = Depends(tenant_db), user: C
     key = storage.save(tid, pdf, "application/pdf")
     s.add(StoredFile(tenant_id=tid, key=key, ten_goc=f"bien-ban-giao-ban-{body.ky}.pdf", content_type="application/pdf", kich_thuoc=len(pdf), nguoi_tai_len_id=user.id))
     m = MeetingSession(tenant_id=tid, ngay=date.today(), ky=body.ky, thanh_phan=body.thanh_phan, ket_luan=body.ket_luan, so_canh_bao=len(rows),
-                       so_giao=len(giao), so_hoan_thanh=len(done), noi_dung={"nq01": data["nq01"]}, file_key=key, nguoi_lap_id=user.id)
+                       so_giao=len(giao), so_hoan_thanh=len(done), noi_dung={"nq01": data["nq01"], "co_minh_hoa": data["co_minh_hoa"]}, file_key=key, nguoi_lap_id=user.id)
     s.add(m)
     await s.commit()
     await record_change(user, tid, f"bien_ban_giao_ban:{m.id}", None, {"ky": body.ky, "so_canh_bao": m.so_canh_bao, "so_giao": m.so_giao, "so_hoan_thanh": m.so_hoan_thanh})

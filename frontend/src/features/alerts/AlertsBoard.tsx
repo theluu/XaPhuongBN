@@ -2,7 +2,10 @@ import * as Dialog from "@radix-ui/react-dialog";
 import * as Tabs from "@radix-ui/react-tabs";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
+import { AssigneePicker, type Assignee } from "@/features/org/AssigneePicker";
 import { Link, useSearchParams } from "react-router-dom";
+import { RelatedDocs } from "@/features/van-ban/VanBanPage";
+import { MessageButton } from "@/features/tin-nhan/MessagesPage";
 import { X } from "lucide-react";
 import { api, ApiError } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
@@ -23,11 +26,12 @@ function CaseDrawer({ alert, onClose }: { alert: AlertRow | null; onClose: () =>
   const { can } = useAuth();
   const qc = useQueryClient();
   const c = alert?.ho_so ?? null;
-  const [f, setF] = useState({ co_quan_xu_ly: "", nguoi_phu_trach: "", han: "", chi_dao: "" });
+  const [f, setF] = useState({ han: "", chi_dao: "" });
+  const [who, setWho] = useState<Assignee>({ unitMa: "", unitTen: "", nguoi: "" });
   const [u, setU] = useState({ nguyen_nhan: c?.nguyen_nhan ?? "", hanh_dong: c?.hanh_dong ?? "", ket_qua: c?.ket_qua ?? "", han: "" });
   const [err, setErr] = useState<string | null>(null);
   const done = () => { qc.invalidateQueries({ queryKey: ["alerts"] }); onClose(); };
-  const assign = useMutation({ mutationFn: () => api(`/api/alerts/${alert!.id}/assign`, { method: "POST", body: f }), onSuccess: done, onError: (e) => setErr(errText(e)) });
+  const assign = useMutation({ mutationFn: () => api(`/api/alerts/${alert!.id}/assign`, { method: "POST", body: { co_quan_xu_ly: who.unitTen.trim(), nguoi_phu_trach: who.nguoi.trim(), ...f } }), onSuccess: done, onError: (e) => setErr(errText(e)) });
   const update = useMutation({
     mutationFn: (trang_thai: string) => api(`/api/cases/${c!.id}`, { method: "PATCH", body: { trang_thai, nguyen_nhan: u.nguyen_nhan, hanh_dong: u.hanh_dong, ket_qua: u.ket_qua, han: u.han || undefined } }),
     onSuccess: done, onError: (e) => setErr(errText(e)),
@@ -47,17 +51,19 @@ function CaseDrawer({ alert, onClose }: { alert: AlertRow | null; onClose: () =>
               <p className="mt-1 text-[13px] text-muc-nhat">{alert.quy_tac}. Căn cứ Dự thảo mục {alert.can_cu}. {MUC[alert.muc_do]}.</p>
               {alert.mo_ta && <p className="mt-2 text-[14.5px]">{alert.mo_ta}</p>}
               {alert.ghi_chu_chat_luong && <p className="mt-2 rounded border border-vien bg-nen px-3 py-2 text-[13.5px]">{alert.ghi_chu_chat_luong}</p>}
-              {alert.link && <Link to={alert.link} className="mt-2 inline-block text-[14px] underline">Mở dữ liệu liên quan</Link>}
+              <div className="mt-2 flex flex-wrap items-center gap-3">
+                {alert.link && <Link to={alert.link} className="text-[14px] underline">Mở dữ liệu liên quan</Link>}
+                <MessageButton loai="canh_bao" id={alert.id} ten={alert.tieu_de} goiY={c?.nguoi_phu_trach} />
+              </div>
               {err && <p role="alert" className="mt-3 text-sm text-son">{err}</p>}
               {!c ? (
                 canAssign ? (
                   <form className="mt-5 space-y-3" onSubmit={(e) => { e.preventDefault(); assign.mutate(); }}>
                     <h3 className="font-semibold">Giao xử lý</h3>
-                    <label className="block text-sm font-medium">Cơ quan xử lý<input className="o-nhap mt-1" value={f.co_quan_xu_ly} onChange={(e) => setF({ ...f, co_quan_xu_ly: e.target.value })} /></label>
-                    <label className="block text-sm font-medium">Người phụ trách<input className="o-nhap mt-1" value={f.nguoi_phu_trach} onChange={(e) => setF({ ...f, nguoi_phu_trach: e.target.value })} /></label>
-                    <label className="block text-sm font-medium">Hạn xử lý<input type="date" className="o-nhap mt-1" value={f.han} onChange={(e) => setF({ ...f, han: e.target.value })} /></label>
+                    <AssigneePicker value={who} onChange={setWho} nhom={alert.nhom} unitLabel="Cơ quan xử lý" />
+                    <label className="block text-sm font-medium">Hạn xử lý<input type="date" className="o-nhap mt-1" min={new Date().toISOString().slice(0, 10)} value={f.han} onChange={(e) => setF({ ...f, han: e.target.value })} /></label>
                     <label className="block text-sm font-medium">Nội dung chỉ đạo<textarea className="o-nhap mt-1" rows={3} value={f.chi_dao} onChange={(e) => setF({ ...f, chi_dao: e.target.value })} /></label>
-                    <button type="submit" className="btn-chinh" disabled={!f.co_quan_xu_ly.trim() || !f.nguoi_phu_trach.trim() || !f.han || assign.isPending}>Giao xử lý</button>
+                    <button type="submit" className="btn-chinh" disabled={!who.unitTen.trim() || !who.nguoi.trim() || !f.han || assign.isPending}>Giao xử lý</button>
                   </form>
                 ) : <p className="mt-5 text-[14px] text-muc-nhat">Cảnh báo chưa được giao xử lý.</p>
               ) : (
@@ -69,6 +75,7 @@ function CaseDrawer({ alert, onClose }: { alert: AlertRow | null; onClose: () =>
                     <dt className="nhan">Hạn</dt><dd>{formatDate(c.han)}</dd>
                     {c.chi_dao && (<><dt className="nhan">Chỉ đạo</dt><dd>{c.chi_dao}</dd></>)}
                   </dl>
+                  <RelatedDocs caseId={c.id} />
                   <label className="block text-sm font-medium">Nguyên nhân<textarea className="o-nhap mt-1" rows={2} value={u.nguyen_nhan} onChange={(e) => setU({ ...u, nguyen_nhan: e.target.value })} /></label>
                   <label className="block text-sm font-medium">Hành động khắc phục<textarea className="o-nhap mt-1" rows={2} value={u.hanh_dong} onChange={(e) => setU({ ...u, hanh_dong: e.target.value })} /></label>
                   <label className="block text-sm font-medium">Kết quả xử lý<textarea className="o-nhap mt-1" rows={2} value={u.ket_qua} onChange={(e) => setU({ ...u, ket_qua: e.target.value })} /></label>

@@ -1,4 +1,5 @@
 import * as Dialog from "@radix-ui/react-dialog";
+import { NguonTrachNhiem } from "@/features/org/DauMoi";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
@@ -67,6 +68,7 @@ export function ServicesPage() {
       <PageHeader title="Hành chính công, phản ánh kiến nghị" desc="Hồ sơ TTHC theo ngày/tuần/tháng và bộ phận; phản ánh kiến nghị theo trạng thái và thời hạn xử lý quy định cho từng loại việc.">
         {can("nhap", "tthc_pakn") && <button type="button" className="btn-chinh" onClick={() => setOpen(true)}>Nhập số liệu TTHC</button>}
       </PageHeader>
+      <div className="mb-4"><NguonTrachNhiem nhom="tthc_pakn" /></div>
       <p className="mb-4 rounded border border-vien bg-be-mat px-3 py-2 text-[14px]">
         Luồng dữ liệu TTHC từ Cổng Dịch vụ công quốc gia gián đoạn từ 01/6/2026; số liệu tạm thời được nhập qua biểu mẫu động.
         {t.data?.co_so_tam_thoi && <strong className="ml-1 font-medium" style={{ color: "var(--tam-thoi)" }}>Kỳ đang xem có số liệu tạm thời chờ xác nhận.</strong>}
@@ -114,7 +116,7 @@ export function ServicesPage() {
                 <div><dt className="nhan">Hài lòng (1–5)</dt><dd className="text-2xl font-semibold tabular">{formatNumber(p.data.hai_long_tb)}</dd></div>
               </dl>
             )}
-            <h3 className="mb-1 text-[15px] font-semibold">Cần đôn đốc</h3>
+            <h3 className="mb-1 the-tieu-de">Cần đôn đốc</h3>
             <ul className="divide-y divide-[var(--vien)] text-[14px]">
               {(u.data ?? []).map((x) => (
                 <li key={x.ma} className="flex items-start justify-between gap-3 py-2">

@@ -70,10 +70,14 @@ async def _tiles(s: AsyncSession, user: CurrentUser, tid: int, ky: str, tdp: int
     if user.can("doc", "dau_tu_cong"):
         p = await project_summary(s, tid, ky)
         l1 = p["theo_lop"]["1"]
-        out.append(tile("DTC-GN", "Giải ngân đầu tư công (phường làm chủ đầu tư)", float(p["ty_le_giai_ngan_ns_phuong"]) if p["ty_le_giai_ngan_ns_phuong"] is not None else None,
-                        "%", ky, "/dau-tu-cong", "dau_tu_cong", status="nguy_co" if l1["so_cham"] else "dat",
-                        nguon="Chủ đầu tư báo cáo, Kho bạc đối soát", don_vi_cung_cap="Ban quản lý dự án phường",
-                        ghi_chu=f"{l1['so_du_an']} dự án, {l1['so_cham']} dự án chậm so với lịch vốn", is_sample=p["is_sample"]))
+        rate = p["ty_le_giai_ngan_ns_phuong"]
+        st = "chua_du_du_lieu" if rate is None else ("nguy_co" if l1["so_cham"] else "dat")
+        note = f"{l1['so_du_an']} dự án, {l1['so_cham']} chậm so với lịch vốn"
+        if l1["thieu_so_lieu"]:
+            note += f"; tỷ lệ tính trên {l1['du_so_lieu']}/{l1['so_du_an']} dự án đủ số liệu"
+        out.append(tile("DTC-GN", "Giải ngân đầu tư công (phường làm chủ đầu tư)", float(rate) if rate is not None else None,
+                        "%", ky, "/dau-tu-cong", "dau_tu_cong", status=st, nguon="Chủ đầu tư báo cáo, Kho bạc đối soát",
+                        don_vi_cung_cap="Ban quản lý dự án phường", ghi_chu=note, is_sample=p["is_sample"]))
     if user.can("doc", "dan_cu"):
         q = select(func.sum(PopulationStat.gia_tri)).where(PopulationStat.tenant_id == tid, PopulationStat.ky == ky, PopulationStat.chi_so == "nhan_khau")
         ten = "Dân số"
@@ -100,8 +104,9 @@ async def _tiles(s: AsyncSession, user: CurrentUser, tid: int, ky: str, tdp: int
                         data_state="tam_thoi" if tt["co_so_tam_thoi"] else "da_xac_nhan", nguon="Biểu mẫu động (luồng DVCQG gián đoạn)",
                         don_vi_cung_cap="Bộ phận Một cửa", ghi_chu=f"{vn(tt['tong']['tiep_nhan'], 0)} hồ sơ tiếp nhận", is_sample=tt["is_sample"]))
         pk = await pakn_summary(s, tid, today - timedelta(days=90), today, today)
-        out.append(tile("PAKN-QH", "Phản ánh kiến nghị quá hạn", float(pk["theo_trang_thai"]["qua_han"]), "phản ánh", ky, "/hanh-chinh", "tthc_pakn",
-                        status="nguy_co" if pk["theo_trang_thai"]["qua_han"] else "dat", nguon="Hệ thống phản ánh kiến nghị (API)",
+        qh = pk["theo_trang_thai"]["qua_han"] if pk["tong"] else None
+        out.append(tile("PAKN-QH", "Phản ánh kiến nghị quá hạn", float(qh) if qh is not None else None, "phản ánh", ky, "/hanh-chinh", "tthc_pakn",
+                        status="chua_du_du_lieu" if qh is None else ("nguy_co" if qh else "dat"), nguon="Hệ thống phản ánh kiến nghị (API)",
                         don_vi_cung_cap="Hệ thống PAKN thành phố", ghi_chu=f"{pk['tong']} phản ánh trong 90 ngày", is_sample=pk["is_sample"]))
     return out
 

@@ -26,7 +26,7 @@ async def test_tenant_info_default_agency_name(client):
     t = await make_tenant("Xã An Lạc", cap="xa")
     u = await make_user(t, "lanh_dao")
     j = (await client.get("/api/tenant", headers=bearer(await login(client, u["username"])))).json()
-    assert j["ten_co_quan"] == ["ĐẢNG ỦY – UBND XÃ AN LẠC", "Hệ thống điều hành số xã"]
+    assert j["ten_co_quan"] == ["ỦY BAN NHÂN DÂN XÃ AN LẠC", "TRUNG TÂM ĐIỀU HÀNH THÔNG MINH"]
 
 
 async def test_sample_flag(client):

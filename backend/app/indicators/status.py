@@ -38,8 +38,11 @@ def evaluate(ind: Any, value: Decimal | None, plan: Decimal | None, nam: int | N
         return Evaluation("dat" if value >= plan else "nguy_co", _pct(value, plan), plan)
     if ind.chieu == "giam_tot":
         target = plan
-        if target is None and ind.muc_tieu is not None and ind.han_muc_tieu_nam and nam and nam >= ind.han_muc_tieu_nam:
-            target = Decimal(ind.muc_tieu)
+        if target is None and ind.muc_tieu is not None:
+            if value <= Decimal(ind.muc_tieu):
+                return Evaluation("dat", None, Decimal(ind.muc_tieu))  # đã chạm mục tiêu cuối, kể cả trước năm hạn
+            if ind.han_muc_tieu_nam and nam and nam >= ind.han_muc_tieu_nam:
+                target = Decimal(ind.muc_tieu)
         if target is None:
             return MISSING
         return Evaluation("dat" if value <= target else "nguy_co", None, target)

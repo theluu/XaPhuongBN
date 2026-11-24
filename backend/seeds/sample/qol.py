@@ -2,6 +2,7 @@
 from decimal import Decimal
 
 from app.quality_of_life.models import PointOfInterest
+from seeds.sample import ho_so
 
 POI = [
     ("truong", "Trường Mầm non Việt Yên", 21.2741, 106.0962, "dat", {"cap": "Mầm non", "chuan_qg": "Mức độ 2"}),
@@ -17,6 +18,7 @@ POI = [
 
 
 async def seed(s, tenant_id: int, users: dict) -> None:  # noqa: ANN001
+    P = ho_so.P
     for loai, ten, lat, lng, cl, tt in POI:
-        s.add(PointOfInterest(tenant_id=tenant_id, loai=loai, ten=ten, lat=Decimal(str(lat)), lng=Decimal(str(lng)), thuoc_tinh=tt,
+        s.add(PointOfInterest(tenant_id=tenant_id, loai=loai, ten=P.chu(ten), lat=Decimal(str(P.lat(lat))), lng=Decimal(str(P.lng(lng))), thuoc_tinh=tt,
                               chat_luong_du_lieu=cl, cho_phep_hien_thi=True, is_sample=True))

@@ -1,4 +1,5 @@
 import * as Tabs from "@radix-ui/react-tabs";
+import { NguonTrachNhiem } from "@/features/org/DauMoi";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { Link } from "react-router-dom";
@@ -37,10 +38,11 @@ export function InvestmentPage() {
   return (
     <>
       <PageHeader title="Giải ngân vốn đầu tư công" desc={`Lũy kế đến hết ${formatPeriod(ky)}. So sánh với lịch vốn đã phê duyệt của từng dự án, không chia đều theo tháng.`} />
+      <div className="mb-4"><NguonTrachNhiem nhom="dau_tu_cong" /></div>
       {s && (
         <div className="mb-4 grid gap-4 md:grid-cols-[280px_1fr]">
           <section className="khu rounded-md p-4">
-            <h2 className="text-[15px] font-semibold">Tỷ lệ giải ngân ngân sách phường</h2>
+            <h2 className="the-tieu-de">Tỷ lệ giải ngân ngân sách phường</h2>
             <div className="font-so text-[52px] font-semibold leading-tight tabular">{s.ty_le_giai_ngan_ns_phuong === null ? "—" : `${formatNumber(s.ty_le_giai_ngan_ns_phuong, 1)}%`}</div>
             <p className="text-[13px] text-muc-nhat">{formatMoney(s.theo_lop["1"].giai_ngan)} / kế hoạch vốn {formatMoney(s.theo_lop["1"].ke_hoach_von)}</p>
           </section>

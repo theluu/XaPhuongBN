@@ -15,6 +15,11 @@ class Settings(BaseSettings):
     STORAGE_DIR: str = "/data/storage"
     SEED_PASSWORD: str = ""
     APP_ENV: str = "local"
+    # reCAPTCHA v2 chống spam đăng nhập — để trống cả hai để tắt
+    RECAPTCHA_SITE_KEY: str = ""
+    RECAPTCHA_SECRET: str = ""
+    RECAPTCHA_VERIFY_URL: str = "https://www.google.com/recaptcha/api/siteverify"
+    RECAPTCHA_HOSTNAMES: str = ""  # danh sách tên miền hợp lệ, phân cách bằng dấu phẩy (trống = không kiểm)
 
 
 @lru_cache
@@ -33,3 +38,5 @@ def check_production(s: Settings) -> None:
         raise RuntimeError("JWT_SECRET chưa được đặt giá trị bí mật riêng (≥ 32 ký tự) cho môi trường thật")
     if not s.REQUIRE_2FA:
         raise RuntimeError("Môi trường thật phải bật REQUIRE_2FA=true")
+    if bool(s.RECAPTCHA_SITE_KEY) != bool(s.RECAPTCHA_SECRET):
+        raise RuntimeError("Cần đặt đủ cả RECAPTCHA_SITE_KEY và RECAPTCHA_SECRET (hoặc để trống cả hai)")

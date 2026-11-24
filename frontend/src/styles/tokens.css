@@ -1,31 +1,43 @@
-/* Hệ màu "Con dấu xác nhận" — xem docs/superpowers/plans (Thiết kế giao diện) */
+/* Hệ màu theo docs/spec/thiet-ke-giao-dien-ioc-phuong-xa.md §1 */
 :root {
-  --nen: #eef2f3;          /* giấy can bản đồ */
-  --be-mat: #ffffff;
-  --be-mat-2: #f6f8f9;
-  --muc: #16324a;          /* mực xanh công văn */
-  --muc-nhat: #4a6175;
-  --vien: rgba(22, 50, 74, 0.14);
-  --xac-nhan: #1e7358;
-  --tam-thoi: #b7791f;
-  --son: #b42318;          /* đỏ son — chỉ cho việc cần chỉ đạo & quá hạn */
-  --thieu: #8796a3;
-  --co-do: #da251d;
-  --co-vang: #ffcd00;
-  --focus: #1d5fa8;
+  --nen: #eef2f8;          /* nền trang */
+  --be-mat: #ffffff;       /* thẻ, bảng */
+  --be-mat-2: #f2f5fa;
+  --muc: #0f2742;          /* chữ chính */
+  --muc-nhat: #475569;
+  --vien: rgba(18, 50, 84, 0.11);
+  --vien-dam: rgba(18, 50, 84, 0.2);
+  --bong: 0 1px 2px rgba(15, 42, 77, 0.05), 0 6px 20px -6px rgba(15, 42, 77, 0.12);
+  --bong-nho: 0 1px 2px rgba(15, 42, 77, 0.06), 0 2px 8px -2px rgba(15, 42, 77, 0.08);
+  --bo-goc: 14px;
+  --dieu-huong: #0f2a4d;   /* thanh đầu trang, điều hướng */
+  --dieu-huong-2: #0d2442;
+  --nhan-dien: #9f2026;    /* đường nhấn đỏ sẫm */
+  --vang: #f3c14b;         /* phối vàng nhận diện */
+  --chinh: #1d4ed8;        /* nút chính, liên kết */
+  --xac-nhan: #15803d;     /* đã xử lý */
+  --tam-thoi: #a16207;     /* sắp đến hạn */
+  --son: #b91c1c;          /* quá hạn, khẩn cấp */
+  --thieu: #64748b;        /* dữ liệu chưa cập nhật */
+  --co-do: #9f2026;
+  --co-vang: #d4a017;
+  --focus: #1d4ed8;
   color-scheme: light;
 }
 [data-theme="dark"] {
-  --nen: #0f2436;          /* xanh đêm bản đồ */
-  --be-mat: #16324a;
-  --be-mat-2: #1b3a55;
-  --muc: #e6edf2;
+  --nen: #0b1d31;
+  --be-mat: #123254;
+  --be-mat-2: #173d64;
+  --muc: #e6edf5;
   --muc-nhat: #a9bccb;
   --vien: rgba(230, 237, 242, 0.16);
-  --xac-nhan: #3fa37f;
-  --tam-thoi: #d9a43f;
-  --son: #e0533f;
-  --thieu: #6e8496;
-  --focus: #7db4ee;
+  --dieu-huong: #0a1a2c;
+  --dieu-huong-2: #123254;
+  --chinh: #60a5fa;
+  --xac-nhan: #4ade80;
+  --tam-thoi: #facc15;
+  --son: #f87171;
+  --thieu: #94a3b8;
+  --focus: #93c5fd;
   color-scheme: dark;
 }

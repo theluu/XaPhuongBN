@@ -54,12 +54,13 @@ async def summary(s: AsyncSession, tenant_id: int, ky: str) -> dict:
     theo_lop = {}
     for lop in (1, 2, 3):
         rs = [r for r in rows if r["lop"] == lop]
-        kh = [r["ke_hoach_von_nam"] for r in rs if r["ke_hoach_von_nam"] is not None]
-        gn = [r["giai_ngan_luy_ke"] for r in rs if r["giai_ngan_luy_ke"] is not None]
+        # chỉ cộng dự án có ĐỦ cả kế hoạch vốn năm và số giải ngân — tránh tử/mẫu lệch phạm vi
+        full = [r for r in rs if r["ke_hoach_von_nam"] is not None and r["giai_ngan_luy_ke"] is not None]
         theo_lop[str(lop)] = {
-            "ten": LOP[lop], "so_du_an": len(rs), "ke_hoach_von": sum(kh, Decimal(0)) if kh else None,
-            "giai_ngan": sum(gn, Decimal(0)) if gn else None, "so_cham": sum(r["cham_giai_ngan"] for r in rs),
-            "thieu_so_lieu": sum(r["giai_ngan_luy_ke"] is None for r in rs), "tinh_vao_ty_le": lop == 1,
+            "ten": LOP[lop], "so_du_an": len(rs), "du_so_lieu": len(full),
+            "ke_hoach_von": sum((r["ke_hoach_von_nam"] for r in full), Decimal(0)) if full else None,
+            "giai_ngan": sum((r["giai_ngan_luy_ke"] for r in full), Decimal(0)) if full else None,
+            "so_cham": sum(r["cham_giai_ngan"] for r in rs), "thieu_so_lieu": len(rs) - len(full), "tinh_vao_ty_le": lop == 1,
         }
     l1 = theo_lop["1"]
     return {"ky": ky, "ty_le_giai_ngan_ns_phuong": _pct(l1["giai_ngan"], l1["ke_hoach_von"]), "theo_lop": theo_lop,

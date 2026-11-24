@@ -75,6 +75,18 @@ def parse_cell(col: Col, v: object) -> object:
     return s or None
 
 
+def _period_error(ind: Indicator, ky: str) -> str | None:
+    from fastapi import HTTPException as _H
+
+    from app.indicators.service import check_period
+
+    try:
+        check_period(ind, ky)
+    except _H as e:
+        return str(e.detail)
+    return None
+
+
 def _int(v: Decimal | None) -> int:
     return int(v or 0)
 
@@ -91,6 +103,8 @@ async def validate_row(s: AsyncSession, user: CurrentUser, spec: Spec, row: dict
             err.append(("Mã chỉ tiêu", f"Mã chỉ tiêu {row['Mã chỉ tiêu']} không có trong danh mục"))
         elif not user.can("nhap", ind.nhom):
             err.append(("Mã chỉ tiêu", f"Bạn không có quyền nhập số liệu nhóm {ind.nhom}"))
+        elif (perr := _period_error(ind, row["Kỳ báo cáo"])) is not None:
+            err.append(("Kỳ báo cáo", perr))
         elif not row.get("Ghi chú/Lý do"):
             confirmed = (await s.execute(select(IndicatorValue.id).where(
                 IndicatorValue.indicator_id == ind.id, IndicatorValue.ky_bao_cao == row["Kỳ báo cáo"],
@@ -110,8 +124,13 @@ async def validate_row(s: AsyncSession, user: CurrentUser, spec: Spec, row: dict
             cache["projects"] = {p.ma_du_an: p for p in (await s.execute(select(Project).where(Project.tenant_id == tid))).scalars()}
         if row["Mã dự án"] not in cache["projects"]:
             err.append(("Mã dự án", f"Mã dự án {row['Mã dự án']} không có trong danh mục"))
-    elif spec.loai == "ngan_sach" and row.get("Loại") == "chi" and row.get("Phạm vi") == "dia_ban":
-        err.append(("Phạm vi", "Số chi chỉ thuộc ngân sách phường (ns_phuong)"))
+    elif spec.loai == "ngan_sach":
+        if row.get("Loại") == "chi" and row.get("Phạm vi") == "dia_ban":
+            err.append(("Phạm vi", "Số chi chỉ thuộc ngân sách phường (ns_phuong)"))
+        closed = (await s.execute(select(BudgetLine.id).where(
+            BudgetLine.tenant_id == tid, BudgetLine.ky == row["Kỳ"], BudgetLine.trang_thai_doi_soat == "da_doi_soat"))).first()
+        if closed:
+            err.append(("Kỳ", f"Kỳ {row['Kỳ']} đã chốt đối soát, không được ghi đè"))
     return err
 
 

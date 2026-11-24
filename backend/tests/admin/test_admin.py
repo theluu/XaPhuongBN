@@ -26,9 +26,13 @@ async def test_onboard_new_ward_end_to_end(client):
     j = r.json()
     assert j["so_chi_tieu"] >= 23 and j["so_tdp"] == 6 and j["mat_khau_tam"]
     r = await client.post("/api/auth/login", json={"username": body["lanh_dao"]["username"], "password": j["mat_khau_tam"]})
+    tmp = bearer(r.json()["access_token"])
+    assert (await client.get("/api/overview", headers=tmp)).status_code == 403  # phải đổi mật khẩu tạm trước
+    await client.post("/api/auth/change-password", json={"mat_khau_cu": j["mat_khau_tam"], "mat_khau_moi": "Lanh-dao-moi@2026"}, headers=tmp)
+    r = await client.post("/api/auth/login", json={"username": body["lanh_dao"]["username"], "password": "Lanh-dao-moi@2026"})
     tok = bearer(r.json()["access_token"])
     me = (await client.get("/api/tenant", headers=tok)).json()
-    assert me["ten"] == "Phường Demo 2" and me["ten_co_quan"][0] == "ĐẢNG ỦY – UBND PHƯỜNG DEMO 2"
+    assert me["ten"] == "Phường Demo 2" and me["ten_co_quan"] == ["ỦY BAN NHÂN DÂN PHƯỜNG DEMO 2", "TRUNG TÂM ĐIỀU HÀNH THÔNG MINH"]
     assert me["modules"]["ngan_sach"] == "dang_ket_noi"
     assert (await client.get("/api/sample-flag", headers=tok)).json() == {"co_du_lieu_minh_hoa": False}
     ov = (await client.get("/api/overview", headers=tok)).json()

@@ -66,6 +66,12 @@ CONFIRMER = {"ktxh": "Phó Chủ tịch UBND Hoàng Văn Đức", "dan_cu": "Ph�
              "tthc_pakn": "Phó Chủ tịch UBND Hoàng Văn Đức", "ngan_sach": "Kế toán ngân sách Phạm Thu Dung"}
 
 
+def _ten(s: str, p) -> str:  # noqa: ANN001
+    for a, b in p.doi_ten.items():
+        s = s.replace(a, b)
+    return s
+
+
 def _chot(ky: str) -> datetime:
     end = parse_ky(ky).ket_thuc
     return datetime(end.year, end.month, end.day, tzinfo=UTC) + timedelta(days=5)
@@ -74,14 +80,15 @@ def _chot(ky: str) -> datetime:
 def build(indicators: dict, tenant_id: int, nhap_id: int | None, xn_ids: dict[str, int]):  # noqa: ANN201
     from app.catalog.models import IndicatorPlan
     from app.indicators.models import IndicatorValue
+    from seeds.sample.ho_so import P
 
     rows: list = []
     for ma, series in PLANS.items():
         ind = indicators[ma]
         for ky, v in series.items():
             rows.append(IndicatorPlan(indicator_id=ind.id, tenant_id=tenant_id, nam=int(ky[:4]), ky=ky,
-                                      gia_tri_ke_hoach=Decimal(str(v)), can_cu="Kế hoạch phát triển KT-XH năm (minh họa)"))
-    for src, data in (("phuong", VALUES), ("chuyen_nganh", CHUYEN_NGANH)):
+                                      gia_tri_ke_hoach=Decimal(str(v)), can_cu="Kế hoạch phát triển KT-XH năm (minh họa)", is_sample=True))
+    for src, data in (("phuong", VALUES | P.chi_tieu), ("chuyen_nganh", CHUYEN_NGANH)):
         for ma, series in data.items():
             ind = indicators[ma]
             for ky, v in series.items():
@@ -92,7 +99,7 @@ def build(indicators: dict, tenant_id: int, nhap_id: int | None, xn_ids: dict[st
                     don_vi_cung_cap=ind.don_vi_chu_quan if src == "phuong" else "Bảo hiểm xã hội",
                     thoi_diem_chot=_chot(ky), trang_thai="tam_thoi" if tam else "da_xac_nhan",
                     nguoi_nhap_id=nhap_id, nguoi_xac_nhan_id=None if tam else xn_ids.get(ind.nhom),
-                    nguoi_xac_nhan_ten=None if tam else CONFIRMER.get(ind.nhom, "Chủ tịch UBND Lê Minh Châu"),
+                    nguoi_xac_nhan_ten=None if tam else P.chu(_ten(CONFIRMER.get(ind.nhom, "Chủ tịch UBND Lê Minh Châu"), P)),
                     ngay_xac_nhan=None if tam else _chot(ky) + timedelta(days=2), version=1, is_sample=True,
                 ))
     return rows

@@ -30,9 +30,11 @@ async def upload(file: UploadFile = File(...), s: AsyncSession = Depends(tenant_
 
 
 @router.get("/{key}")
-async def download(key: str, s: AsyncSession = Depends(tenant_db), _: CurrentUser = Depends(get_current_user)) -> Response:
+async def download(key: str, s: AsyncSession = Depends(tenant_db), user: CurrentUser = Depends(get_current_user)) -> Response:
+    from app.tin_nhan.router import may_read_file
+
     f = (await s.execute(select(StoredFile).where(StoredFile.key == key))).scalar()
-    if f is None:
+    if f is None or not await may_read_file(s, key, user):
         raise HTTPException(404, "Không tìm thấy tệp")
     return Response(storage.load(f.tenant_id, f.key, f.content_type), media_type=f.content_type,
                     headers={"Content-Disposition": "inline", "X-Content-Type-Options": "nosniff", "Cache-Control": "private"})

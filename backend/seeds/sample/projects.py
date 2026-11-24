@@ -4,6 +4,7 @@ from datetime import date
 from decimal import Decimal
 
 from app.projects.models import CapitalPlan, Disbursement, Milestone, Project, ProjectIssue
+from seeds.sample import ho_so
 
 TY = Decimal(1_000_000_000)
 LICH = {"2026-03": 0.15, "2026-06": 0.40, "2026-09": 0.65, "2026-10": 0.72}
@@ -22,10 +23,12 @@ DU_AN = [
 
 
 async def seed(s, tenant_id: int, users: dict) -> None:  # noqa: ANN001
+    P = ho_so.P
     ids = {}
     for ma, ten, lop, cdt, nguon, tmdt, kh, f, lat, lng in DU_AN:
+        ten, cdt, lat, lng = P.chu(ten), P.chu(cdt), P.lat(lat), P.lng(lng)
         p = Project(tenant_id=tenant_id, ma_du_an=ma, ten=ten, lop=lop, chu_dau_tu=cdt, nguon_von=nguon,
-                    tong_muc_dt=Decimal(str(tmdt)) * TY, dia_diem="Phường Việt Yên", lat=lat, lng=lng,
+                    tong_muc_dt=Decimal(str(tmdt)) * TY, dia_diem=f"Phường {P.ten}", lat=lat, lng=lng,
                     ngay_ht_ke_hoach=date(2027, 6, 30), don_vi_phu_trach="Phòng Kinh tế, Hạ tầng và Đô thị", is_sample=True)
         s.add(p)
         await s.flush()

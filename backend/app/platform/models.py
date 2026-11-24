@@ -1,6 +1,8 @@
 from datetime import date
 
-from sqlalchemy import JSON, Date, ForeignKey, Integer, String, UniqueConstraint
+from decimal import Decimal
+
+from sqlalchemy import JSON, Boolean, Date, ForeignKey, Integer, Numeric, String, UniqueConstraint
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -36,6 +38,13 @@ class ResidentialGroup(Base):
     tenant_id: Mapped[int] = tenant_fk()
     ma_tdp: Mapped[str] = mapped_column(String(30))
     ten: Mapped[str] = mapped_column(String(200))
+    # Thôn (xã) hoặc tổ dân phố (phường) — tổ chức tự quản dưới cấp xã
+    loai: Mapped[str | None] = mapped_column(String(10), nullable=True)  # thon | tdp; NULL = theo cấp đơn vị
+    nguoi_dung_dau: Mapped[str | None] = mapped_column(String(200), nullable=True)  # Trưởng thôn / Tổ trưởng
+    dien_thoai: Mapped[str | None] = mapped_column(String(30), nullable=True)
+    lat: Mapped[Decimal | None] = mapped_column(Numeric(9, 6), nullable=True)
+    lng: Mapped[Decimal | None] = mapped_column(Numeric(9, 6), nullable=True)
+    ngung_hoat_dong: Mapped[bool | None] = mapped_column(Boolean, nullable=True)
 
 
 class AdminUnitMapping(Base):

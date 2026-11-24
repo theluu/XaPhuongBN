@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { NguonTrachNhiem } from "@/features/org/DauMoi";
 import { Link } from "react-router-dom";
 import { api } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
@@ -46,6 +47,7 @@ export function ConstructionPage() {
   return (
     <>
       <PageHeader title="Công trình xây dựng, chỉnh trang và quản lý đô thị" desc="Tiến độ kế hoạch và thực tế theo báo cáo hằng tuần của chủ đầu tư, có ảnh hiện trường làm minh chứng." />
+      <div className="mb-4"><NguonTrachNhiem nhom="cong_trinh" /></div>
       {s.data && (
         <div className="mb-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
           {[["Công trình đang theo dõi", s.data.so_cong_trinh, ""], ["Chậm tiến độ", s.data.so_cham, "var(--tam-thoi)"], ["Quá hạn hoàn thành", s.data.so_tre_han, "var(--son)"],

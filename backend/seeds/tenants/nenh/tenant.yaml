@@ -1,0 +1,44 @@
+# Phường thứ hai trong bộ demo — dùng để thấy dữ liệu các đơn vị tách biệt trên cùng hệ thống.
+# Họ tên, số điện thoại là giả định. Tên đăng nhập có tiền tố "nenh." (tên đăng nhập là duy nhất toàn hệ thống);
+# "key" là vai trò tương ứng trong kịch bản dữ liệu minh họa.
+platform: {ma_dvhc: NEN-TANG, ten: Nền tảng điều hành số xã/phường, cap: nen_tang}
+parent: {ma_dvhc: T-BACNINH, ten: Tỉnh Bắc Ninh, cap: tinh}
+tenant:
+  ma_dvhc: P-NENH
+  ten: Phường Nếnh
+  cap: phuong
+  config:
+    ten_co_quan: ["ỦY BAN NHÂN DÂN PHƯỜNG NẾNH", "TRUNG TÂM ĐIỀU HÀNH THÔNG MINH"]
+    tinh: Bắc Ninh
+    slug: nenh
+    ten_mien: [nenh.bacninh.aionlinetest.com]
+    cong_khai:
+      chi_tieu: [NQ01-05a, NQ01-05b, NQ01-06, NQ01-09, NQ01-10, NQ01-12, NQ01-11, NQ01-14, NQ01-15, NQ01-16, NQ01-07a, NQ01-07b, NQ01-08a, NQ01-08b, DT-CX, DT-TRUONG, DT-LOP, DT-HS]
+      tong_hop: [NS-THU-DB, DTC-GN, DC-DAN-SO, TTHC-DH, PAKN-QH]
+      xu_huong_ngan_sach: true
+      gioi_thieu: "Số liệu chỉ tiêu kinh tế – xã hội, ngân sách, đầu tư công và dịch vụ hành chính công do UBND phường xác nhận và công bố theo kỳ."
+    ban_do: {tam: [21.2380, 106.0850], zoom: 14, bbox: [21.215, 106.055, 21.260, 106.115], tile_url: "https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png"}
+    cho_phep_theo_tdp: true
+    logo: null
+  modules: {ktxh: bat, dan_cu: bat, ngan_sach: bat, dau_tu_cong: bat, cong_trinh: bat, tthc_pakn: bat, gd_yt_mt: bat}
+pack: phuong_do_thi
+so_tdp: 9
+users:
+  - {username: nenh.qtphuong, key: qtphuong, ho_ten: Lê Văn Khánh, chuc_danh: Chuyên viên Văn phòng HĐND và UBND (CNTT), role: quan_tri_don_vi}
+  - {username: nenh.bithu, key: bithu, ho_ten: Nguyễn Hữu Thắng, chuc_danh: Bí thư Đảng ủy, role: lanh_dao}
+  - {username: nenh.chutich, key: chutich, ho_ten: Đào Thị Phương, chuc_danh: Chủ tịch UBND, role: lanh_dao}
+  - {username: nenh.ketoan, key: ketoan, ho_ten: Nguyễn Thị Oanh, chuc_danh: "Kế toán ngân sách – Phòng Kinh tế, Hạ tầng và Đô thị", role: xac_nhan, nhom: [ngan_sach, dau_tu_cong]}
+  - {username: nenh.xacnhan, key: xacnhan, ho_ten: Phạm Quốc Toản, chuc_danh: Phó Chủ tịch UBND, role: xac_nhan, nhom: [ktxh, dan_cu, cong_trinh, tthc_pakn, gd_yt_mt]}
+  - {username: nenh.canbo1, key: canbo1, ho_ten: Hoàng Thị Thủy, chuc_danh: Chuyên viên Trung tâm Phục vụ hành chính công, role: nhap_lieu, nhom: [ktxh, dan_cu, ngan_sach, dau_tu_cong, cong_trinh, tthc_pakn, gd_yt_mt]}
+  - {username: nenh.xem, key: xem, ho_ten: Màn hình phòng họp, chuc_danh: Tài khoản màn hình TV phòng điều hành, role: man_hinh_tv}
+  # Cơ quan ngoài phường (DT V.1): tài khoản vai trò cơ quan chuyên ngành, chỉ thao tác nhóm dữ liệu được giao
+  - {username: nenh.sotaichinh, key: sotaichinh, ho_ten: Lê Văn Hùng, chuc_danh: "Sở Tài chính – Trưởng phòng Quản lý ngân sách", role: chuyen_nganh, nhom: [ngan_sach, dau_tu_cong]}
+  - {username: nenh.khobac, key: khobac, ho_ten: Phạm Thị Hương, chuc_danh: "Kho bạc Nhà nước – Trưởng phòng Kiểm soát chi", role: chuyen_nganh, nhom: [ngan_sach, dau_tu_cong]}
+  - {username: nenh.thue, key: thue, ho_ten: Đỗ Quang Minh, chuc_danh: "Cơ quan Thuế – Đội trưởng Đội Thuế liên phường", role: chuyen_nganh, nhom: [ngan_sach]}
+  - {username: nenh.congan, key: congan, ho_ten: Thiếu tá Hoàng Văn Nam, chuc_danh: "Công an thành phố – Phó Đội trưởng Đội Quản lý cư trú", role: chuyen_nganh, nhom: [dan_cu]}
+  - {username: nenh.soxaydung, key: soxaydung, ho_ten: Ngô Thị Thanh, chuc_danh: "Sở Xây dựng – Phó Trưởng phòng Quản lý xây dựng", role: chuyen_nganh, nhom: [cong_trinh]}
+  - {username: nenh.banqlda, key: banqlda, ho_ten: Vũ Đình Khoa, chuc_danh: "Ban QLDA ĐTXD – Phó Giám đốc", role: chuyen_nganh, nhom: [dau_tu_cong, cong_trinh]}
+  - {username: nenh.sogddt, key: sogddt, ho_ten: Bùi Thị Hạnh, chuc_danh: "Sở Giáo dục và Đào tạo – Chuyên viên", role: chuyen_nganh, nhom: [gd_yt_mt]}
+  - {username: nenh.bhxh, key: bhxh, ho_ten: Đặng Văn Lộc, chuc_danh: "Bảo hiểm xã hội – Trưởng phòng Quản lý thu", role: chuyen_nganh, nhom: [gd_yt_mt]}
+  - {username: nenh.moitruong, key: moitruong, ho_ten: Nguyễn Thị Hòa, chuc_danh: "Đơn vị cấp nước, môi trường – Phó Giám đốc", role: chuyen_nganh, nhom: [gd_yt_mt]}
+  - {username: nenh.thongke, key: thongke, ho_ten: Trịnh Văn Hải, chuc_danh: "Cơ quan thống kê – Thống kê viên", role: chuyen_nganh, nhom: [ktxh]}

@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Bar, CartesianGrid, ComposedChart, Line, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { api } from "@/lib/api";
@@ -28,7 +29,7 @@ function Zone({ title, children, className = "", note }: { title: string; childr
   return (
     <section aria-labelledby={id} className={`khu p-4 ${className}`}>
       <div className="mb-3 flex items-baseline justify-between gap-3">
-        <h2 id={id} className="text-[16px] font-semibold">{title}</h2>
+        <h2 id={id} className="the-tieu-de">{title}</h2>
         {note && <span className="text-[13px] text-muc-nhat">{note}</span>}
       </div>
       {children}
@@ -48,7 +49,8 @@ function scheduleText(r: ScheduleRow): string {
 export function OverviewPage() {
   const { ky, tdp, setTdp } = usePeriod();
   const { tenant } = useAuth();
-  const q = useQuery({ queryKey: ["overview", ky, tdp], queryFn: () => api<Overview>("/api/overview", { params: { ky, tdp: tdp || undefined } }) });
+  const [donVi, setDonVi] = useState("");
+  const q = useQuery({ queryKey: ["overview", ky, tdp, donVi], queryFn: () => api<Overview>("/api/overview", { params: { ky, tdp: tdp || undefined, don_vi: donVi || undefined } }) });
   const d = q.data;
   if (!d) return <p className="text-muc-nhat">{q.isError ? "Không tải được dữ liệu tổng quan." : "Đang tải tổng quan…"}</p>;
   const center: [number, number] = d.ban_do.features[0] ? [d.ban_do.features[0].geometry.coordinates[1], d.ban_do.features[0].geometry.coordinates[0]] : [21.2725, 106.0975];
@@ -56,9 +58,18 @@ export function OverviewPage() {
     <div className="space-y-4">
       <div className="flex flex-wrap items-end gap-3">
         <div className="flex-1">
-          <h1 className="text-[26px] font-bold leading-tight">Tổng quan {d.tenant.ten}</h1>
+          <h1 className="text-[22px] font-bold leading-tight">Báo cáo tổng hợp {d.tenant.ten}</h1>
           <p className="text-[15px] text-muc-nhat">Số liệu kỳ {formatPeriod(d.ky)}. Độ đầy đủ dữ liệu chỉ tiêu: {d.do_day_du.ty_le_pct === null ? "—" : `${formatNumber(d.do_day_du.ty_le_pct)}%`} ({d.do_day_du.co_so}/{d.do_day_du.du_kien}).</p>
         </div>
+        {d.bo_loc.don_vi.length > 0 && (
+          <label className="flex items-center gap-2 text-sm">
+            <span className="text-muc-nhat">Đơn vị cung cấp</span>
+            <select className="o-nhap w-auto py-1.5" value={donVi} onChange={(e) => setDonVi(e.target.value)}>
+              <option value="">Tất cả đơn vị</option>
+              {d.bo_loc.don_vi.map((x) => <option key={x} value={x}>{x}</option>)}
+            </select>
+          </label>
+        )}
         {d.bo_loc.tdp.length > 0 && (
           <label className="flex items-center gap-2 text-sm">
             <span className="text-muc-nhat">Tổ dân phố</span>
@@ -115,7 +126,7 @@ export function OverviewPage() {
               ) : <p className="text-[14px] text-muc-nhat">Bạn chưa được cấp quyền xem lớp bản đồ dự án, công trình.</p>}
             </div>
             <div>
-              <h3 className="mb-1 text-[14px] font-semibold">Thu ngân sách trên địa bàn, lũy kế (tỷ đồng)</h3>
+              <h3 className="mb-1 the-tieu-de">Thu ngân sách trên địa bàn, lũy kế (tỷ đồng)</h3>
               {d.xu_huong.length ? (
                 <ResponsiveContainer width="100%" height={260}>
                   <ComposedChart data={d.xu_huong} margin={{ top: 8, right: 8, left: -12, bottom: 0 }}>

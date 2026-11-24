@@ -15,7 +15,7 @@ def agency_name(t: Tenant) -> list[str]:
     if cfg.get("ten_co_quan"):
         return list(cfg["ten_co_quan"])
     if t.cap in ("phuong", "xa"):
-        return [f"ĐẢNG ỦY – UBND {t.ten.upper()}", f"Hệ thống điều hành số {CAP[t.cap]}"]
+        return [f"ỦY BAN NHÂN DÂN {t.ten.upper()}", "TRUNG TÂM ĐIỀU HÀNH THÔNG MINH"]
     return [t.ten.upper(), "Hệ thống điều hành số"]
 
 

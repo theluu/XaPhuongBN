@@ -36,6 +36,11 @@ async def _first_submit(s: AsyncSession, indicator_id: int, ky: str) -> date | N
 
 
 async def submission_report(s: AsyncSession, tenant_id: int, tu: date, den: date, today: date) -> dict:
+    from app.dau_moi.service import brief, lookup
+
+    lk = await lookup(s, tenant_id)
+    by_dm: dict[str, dict] = defaultdict(lambda: defaultdict(int))
+    ten_dm: dict[str, str] = {}
     inds = (await s.execute(select(Indicator).where(Indicator.tenant_id == tenant_id, Indicator.ky_cap_nhat.in_(["tuan", "thang", "quy", "nam"])))).scalars()
     count = defaultdict(int)
     by_dv: dict[str, dict] = defaultdict(lambda: defaultdict(int))
@@ -50,9 +55,13 @@ async def submission_report(s: AsyncSession, tenant_id: int, tu: date, den: date
                 kq = "thieu" if today > han else "chua_den_han"
             count[kq] += 1
             by_dv[ind.don_vi_chu_quan][kq] += 1
+            dms = lk.chi_tieu(ind.ma_chi_tieu, ind.nhom)
+            for dm in dms:
+                by_dm[dm.ma][kq] += 1
+                ten_dm[dm.ma] = dm.ten
             if kq in ("cham", "thieu"):
                 chi_tiet.append({"ma": ind.ma_chi_tieu, "ten": ind.ten, "ky": str(p), "han": han, "ngay_nop": nop, "ket_qua": kq,
-                                 "don_vi": ind.don_vi_chu_quan})
+                                 "don_vi": ind.don_vi_chu_quan, "dau_moi": brief(dms)})
     tong = count["dung_han"] + count["cham"] + count["thieu"]
     return {
         "tu": tu, "den": den, "tong": tong, "dung_han": count["dung_han"], "cham": count["cham"], "thieu": count["thieu"],
@@ -60,12 +69,18 @@ async def submission_report(s: AsyncSession, tenant_id: int, tu: date, den: date
         "thieu_pct": _pct(count["thieu"], tong),
         "theo_don_vi": [{"don_vi": k, "dung_han": v["dung_han"], "cham": v["cham"], "thieu": v["thieu"],
                          "dung_han_pct": _pct(v["dung_han"], v["dung_han"] + v["cham"] + v["thieu"])} for k, v in sorted(by_dv.items())],
+        "theo_dau_moi": [{"ma": k, "ten": ten_dm[k], "dung_han": v["dung_han"], "cham": v["cham"], "thieu": v["thieu"],
+                          "dung_han_pct": _pct(v["dung_han"], v["dung_han"] + v["cham"] + v["thieu"])} for k, v in sorted(by_dm.items())],
         "chi_tiet": sorted(chi_tiet, key=lambda x: (x["ket_qua"] != "thieu", x["han"])),
     }
 
 
 async def reminders(s: AsyncSession, tenant_id: int, today: date, groups: set[str] | None) -> list[dict]:
-    """Nhắc nộp số: kỳ vừa kết thúc sắp đến hạn (≤ 3 ngày) hoặc đã quá hạn mà chưa có số."""
+    """Nhắc nộp số: kỳ vừa kết thúc sắp đến hạn (≤ 3 ngày) hoặc đã quá hạn mà chưa có số.
+    Mỗi mục ghi đầu mối chịu trách nhiệm cung cấp (DT V.1) để nhắc đúng cơ quan."""
+    from app.dau_moi.service import brief, lookup
+
+    lk = await lookup(s, tenant_id)
     q = select(Indicator).where(Indicator.tenant_id == tenant_id, Indicator.ky_cap_nhat.in_(["tuan", "thang", "quy", "nam"]))
     out = []
     for ind in (await s.execute(q.order_by(Indicator.ma_chi_tieu))).scalars():
@@ -85,5 +100,5 @@ async def reminders(s: AsyncSession, tenant_id: int, today: date, groups: set[st
         else:
             continue
         out.append({"ma": ind.ma_chi_tieu, "ten": ind.ten, "nhom": ind.nhom, "ky": str(p), "han": han, "con_lai_ngay": con_lai, "muc": muc,
-                    "don_vi": ind.don_vi_chu_quan})
+                    "don_vi": ind.don_vi_chu_quan, "dau_moi": brief(lk.chi_tieu(ind.ma_chi_tieu, ind.nhom))})
     return sorted(out, key=lambda x: x["con_lai_ngay"])

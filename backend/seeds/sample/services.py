@@ -8,6 +8,7 @@ from sqlalchemy import select
 from app.platform.models import ResidentialGroup
 from app.services_pakn.models import AdminServiceStat
 from app.services_pakn.service import pakn_sink
+from seeds.sample import ho_so
 
 BO_PHAN = [("Bộ phận Một cửa", "HOTICH", 14), ("Bộ phận Một cửa", "CHUNGTHUC", 22), ("Địa chính – Xây dựng", "DATDAI", 6), ("Văn hóa – Xã hội", "LAODONG", 4)]
 LOAI = ["moi_truong", "trat_tu_do_thi", "ha_tang", "an_ninh", "dat_dai"]
@@ -18,14 +19,16 @@ def _r(*p: object) -> int:
 
 
 async def seed(s, tenant_id: int, users: dict) -> None:  # noqa: ANN001
+    P = ho_so.P
+    k = P.dan_so / 51_200
     today = date.today()
     for i in range(60, 0, -1):
         d = today - timedelta(days=i)
         if d.weekday() >= 5:
             continue
         for bp, lv, base in BO_PHAN:
-            r = _r(d, lv)
-            tn = max(1, base + r % 7 - 3)
+            r = _r(d, lv, P.muoi)
+            tn = max(1, round(base * k) + r % 7 - 3)
             gq = max(0, tn - r % 3)
             qh = 1 if (lv == "DATDAI" and r % 4 == 0) else 0
             s.add(AdminServiceStat(tenant_id=tenant_id, ngay=d, bo_phan=bp, linh_vuc=lv, tiep_nhan=tn, giai_quyet=gq, dung_han=gq - qh,
@@ -33,8 +36,8 @@ async def seed(s, tenant_id: int, users: dict) -> None:  # noqa: ANN001
                                    trang_thai="tam_thoi" if i <= 7 else "da_xac_nhan", nguoi_nhap_id=users.get("canbo1"), is_sample=True))
     tdps = [g.id for g in (await s.execute(select(ResidentialGroup).where(ResidentialGroup.tenant_id == tenant_id).order_by(ResidentialGroup.ma_tdp))).scalars()]
     recs = []
-    for i in range(80):
-        r = _r("pakn", i)
+    for i in range(round(80 * k)):
+        r = _r("pakn", P.muoi, i)
         nhan = today - timedelta(days=r % 55)
         age = (today - nhan).days
         tt = "hoan_thanh" if age > 12 and r % 6 else ("tiep_nhan" if age < 2 else "dang_xu_ly")

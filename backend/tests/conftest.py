@@ -5,7 +5,7 @@ from httpx import ASGITransport, AsyncClient
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import create_async_engine
 
-TEST_DB = "ioc_test"
+TEST_DB = os.environ.get("TEST_DB", "ioc_test")  # mỗi phiên làm việc song song dùng một CSDL kiểm thử riêng
 os.environ["APP_ENV"] = "test"
 
 

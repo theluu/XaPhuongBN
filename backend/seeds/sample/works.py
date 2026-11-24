@@ -10,6 +10,7 @@ from app.files import storage
 from app.files.models import StoredFile
 from app.projects.models import Project
 from app.works.models import Work, WorkProgress
+from seeds.sample import ho_so
 
 
 def _png(w: int = 320, h: int = 200, rgb: tuple = (196, 205, 212)) -> bytes:
@@ -31,15 +32,17 @@ CONG_TRINH = [
 
 
 async def seed(s, tenant_id: int, users: dict) -> None:  # noqa: ANN001
+    P = ho_so.P
     png = _png()
     key = storage.save(tenant_id, png, "image/png")
     s.add(StoredFile(tenant_id=tenant_id, key=key, ten_goc="anh-hien-truong-minh-hoa.png", content_type="image/png",
                      kich_thuoc=len(png), nguoi_tai_len_id=users.get("canbo1") or 0))
     pids = {p.ma_du_an: p.id for p in (await s.execute(select(Project).where(Project.tenant_id == tenant_id))).scalars()}
     for ma, ten, loai, da, lat, lng, dv, ht, (kh, tt), cl, note in CONG_TRINH:
-        w = Work(tenant_id=tenant_id, ma_cong_trinh=ma, ten=ten, loai=loai, project_id=pids.get(da), dia_diem="Phường Việt Yên",
-                 lat=lat, lng=lng, don_vi_thuc_hien=dv, chu_dau_tu="UBND phường Việt Yên", ngay_kc=date(2026, 4, 15), ngay_ht=ht,
-                 chat_luong=cl, camera_url="https://camera.vietyen.example/ct01" if ma == "CT-01" else None, is_sample=True)
+        ten, dv, lat, lng = P.chu(ten), P.chu(dv), P.lat(lat), P.lng(lng)
+        w = Work(tenant_id=tenant_id, ma_cong_trinh=ma, ten=ten, loai=loai, project_id=pids.get(da), dia_diem=f"Phường {P.ten}",
+                 lat=lat, lng=lng, don_vi_thuc_hien=dv, chu_dau_tu=f"UBND phường {P.ten}", ngay_kc=date(2026, 4, 15), ngay_ht=ht,
+                 chat_luong=cl, camera_url=f"https://camera.{P.slug}.example/ct01" if ma == "CT-01" else None, is_sample=True)
         s.add(w)
         await s.flush()
         lich = [(date(2026, 9, 25), 0.6), (date(2026, 10, 16), 0.8), (date(2026, 11, 6), 1.0)]

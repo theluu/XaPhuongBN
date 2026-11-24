@@ -11,13 +11,26 @@ from app.audit.middleware import client_ip
 from app.audit.service import record, record_change
 from app.auth.deps import get_current_user, require
 from app.auth.models import Grant, User
-from app.auth.roles import ROLES, ROLES_2FA, default_grants
+from app.auth.roles import NEED_LEADER_APPROVAL, ROLES, ROLES_2FA, UNIT_CREATABLE, default_grants
 from app.auth.security import hash_password, make_token, temp_password, verify_password
 from app.core.config import get_settings
 from app.core.db import admin_sessionmaker
 from app.core.principal import CurrentUser
 
 router = APIRouter(prefix="/api", tags=["xac-thuc"])
+
+
+def otp_step(secret: str, code: str, last: int | None) -> int | None:
+    """Trả về bước thời gian của mã hợp lệ (±1 bước), từ chối mã đã dùng."""
+    import hmac
+    import time
+
+    totp = pyotp.TOTP(secret)
+    now = int(time.time() // 30)
+    for st in (now - 1, now, now + 1):
+        if hmac.compare_digest(totp.at(st * 30), str(code).strip()) and st > (last or 0):
+            return st
+    return None
 BAD_LOGIN = "Sai tên đăng nhập hoặc mật khẩu"
 
 
@@ -25,23 +38,46 @@ class LoginIn(BaseModel):
     username: str
     password: str
     otp: str | None = None
+    captcha: str | None = None
 
 
 def user_out(u: User, p: CurrentUser | None = None) -> dict:
     return {
         "id": u.id, "username": u.username, "ho_ten": u.ho_ten, "don_vi": u.don_vi, "chuc_danh": u.chuc_danh,
-        "tenant_id": u.tenant_id, "phai_doi_mat_khau": u.phai_doi_mat_khau,
+        "tenant_id": p.tenant_id if p and p.dai_dien else u.tenant_id, "phai_doi_mat_khau": u.phai_doi_mat_khau,
+        "dai_dien": bool(p and p.dai_dien),
         "roles": sorted(p.roles) if p else [],
         "quyen": {k: sorted(v) for k, v in p.permissions.items()} if p else {},
     }
 
 
+@router.get("/auth/config")
+async def auth_config() -> dict:
+    """Cấu hình công khai cho trang đăng nhập."""
+    from app.auth import captcha
+
+    return {"recaptcha_site_key": get_settings().RECAPTCHA_SITE_KEY if captcha.enabled() else None}
+
+
+CAPTCHA_MISSING = "Vui lòng đánh dấu ô “Tôi không phải người máy”"
+CAPTCHA_BAD = "Xác minh chống spam không thành công, vui lòng thử lại"
+
+
 @router.post("/auth/login")
 async def login(body: LoginIn, request: Request) -> dict:
+    from app.auth import captcha
+
     s_ = get_settings()
     now = datetime.now(UTC)
     status, detail, user_id, tenant_id = 401, BAD_LOGIN, None, None
     try:
+        if captcha.enabled():
+            if not body.captcha:
+                status = 400
+                raise HTTPException(400, CAPTCHA_MISSING)
+            if not await captcha.verify(body.captcha, client_ip(request)):
+                status = 400
+                raise HTTPException(400, CAPTCHA_BAD)
         async with admin_sessionmaker()() as s:
             u = (await s.execute(select(User).where(User.username == body.username))).scalar()
             if u is None:
@@ -51,21 +87,42 @@ async def login(body: LoginIn, request: Request) -> dict:
             if u.locked_until and u.locked_until > now:
                 status = 423
                 raise HTTPException(423, f"Tài khoản tạm khóa {s_.LOCKOUT_MINUTES} phút")
-            if u.trang_thai != "hoat_dong" or not verify_password(body.password, u.password_hash):
+            async def fail(msg: str) -> None:
                 u.failed_count += 1
                 if u.failed_count >= s_.LOCKOUT_THRESHOLD:
                     u.locked_until = now + timedelta(minutes=s_.LOCKOUT_MINUTES)
                     u.failed_count = 0
                 await s.commit()
-                raise HTTPException(401, BAD_LOGIN)
+                raise HTTPException(401, msg)
+
+            if u.trang_thai != "hoat_dong" or not verify_password(body.password, u.password_hash):
+                await fail(BAD_LOGIN)
+            if u.tenant_id is not None:  # trên tên miền riêng của một phường: chỉ cán bộ phường đó (và quản trị nền tảng) đăng nhập được
+                from app.cong_khai.router import request_host
+                from app.cong_khai.service import tenant_for_host
+                from app.platform.models import Tenant
+
+                host_t = await tenant_for_host(s, request_host(request))
+                own = await s.get(Tenant, u.tenant_id)
+                if host_t is not None and host_t.id != u.tenant_id and (own is None or own.cap != "nen_tang"):
+                    await fail(BAD_LOGIN)
+            if u.tenant_id is not None:
+                from app.platform.models import Tenant
+
+                t = await s.get(Tenant, u.tenant_id)
+                if t is not None and t.trang_thai != "hoat_dong":
+                    status = 403
+                    raise HTTPException(403, "Đơn vị đang tạm dừng sử dụng hệ thống, liên hệ quản trị nền tảng")
             roles = set((await s.execute(select(Grant.role).where(Grant.user_id == u.id))).scalars())
             if s_.REQUIRE_2FA and roles & ROLES_2FA:
                 if not u.totp_secret:
                     raise HTTPException(403, "Tài khoản chưa thiết lập xác thực 2 lớp, liên hệ quản trị đơn vị")
                 if not body.otp:
                     raise HTTPException(401, "Cần mã xác thực 2 lớp")
-                if not pyotp.TOTP(u.totp_secret).verify(body.otp, valid_window=1):
-                    raise HTTPException(401, "Mã xác thực không đúng")
+                step = otp_step(u.totp_secret, body.otp, u.totp_last)
+                if step is None:
+                    await fail("Mã xác thực không đúng hoặc đã được dùng")
+                u.totp_last = step
             u.failed_count = 0
             u.locked_until = None
             await s.commit()
@@ -117,19 +174,29 @@ async def revoke(user_id: int, body: RevokeIn, actor: CurrentUser = Depends(requ
 
 
 @router.post("/users/{user_id}/approve", tags=["nguoi-dung"])
-async def approve(user_id: int, actor: CurrentUser = Depends(require("duyet", "quan_tri"))) -> dict:
+async def approve(user_id: int, actor: CurrentUser = Depends(get_current_user)) -> dict:
     pw = temp_password()
     async with admin_sessionmaker()() as s:
         u = await _own_user(s, actor, user_id)
         if u.trang_thai != "cho_duyet":
             raise HTTPException(409, "Tài khoản không ở trạng thái chờ duyệt")
+        roles = set((await s.execute(select(Grant.role).where(Grant.user_id == u.id))).scalars())
+        if roles & NEED_LEADER_APPROVAL:
+            if "lanh_dao" not in actor.roles or actor.id == u.nguoi_phe_duyet_id:
+                raise HTTPException(403, "Tài khoản lãnh đạo, quản trị phải do lãnh đạo đơn vị phê duyệt")
+        elif not actor.can("duyet", "quan_tri"):
+            raise HTTPException(403, "Bạn không có quyền phê duyệt tài khoản")
         u.trang_thai = "hoat_dong"
         u.password_hash = hash_password(pw)
         u.phai_doi_mat_khau = True
         u.nguoi_phe_duyet_id = actor.id
+        secret = None
+        if roles & ROLES_2FA:
+            u.totp_secret = secret = pyotp.random_base32()
         await s.commit()
     await record_change(actor, u.tenant_id, f"nguoi_dung:{user_id}:phe_duyet", {"trang_thai": "cho_duyet"}, {"trang_thai": "hoat_dong"})
-    return {"ok": True, "mat_khau_tam": pw, "ghi_chu": "Mật khẩu tạm chỉ hiển thị một lần; người dùng phải đổi khi đăng nhập"}
+    return {"ok": True, "mat_khau_tam": pw, "totp_secret": secret,
+            "ghi_chu": "Mật khẩu tạm và mã xác thực 2 lớp chỉ hiển thị một lần; người dùng phải đổi mật khẩu khi đăng nhập"}
 
 
 IMPORT_COLS = ["Tên đăng nhập", "Họ tên", "Đơn vị", "Chức danh", "Email", "Vai trò", "Nhóm dữ liệu", "Phạm vi khai thác", "Người phê duyệt"]
@@ -162,9 +229,11 @@ async def import_users(file: UploadFile = File(...), actor: CurrentUser = Depend
                 loi.append({"dong": i, "cot": "Người phê duyệt", "thong_bao": "Bắt buộc ghi người phê duyệt"})
             if v["Vai trò"] and v["Vai trò"] not in ROLES:
                 loi.append({"dong": i, "cot": "Vai trò", "thong_bao": f"Vai trò '{v['Vai trò']}' không có trong danh mục"})
+            elif v["Vai trò"] and v["Vai trò"] not in UNIT_CREATABLE:
+                loi.append({"dong": i, "cot": "Vai trò", "thong_bao": f"Vai trò '{v['Vai trò']}' không được tạo bởi quản trị đơn vị"})
             nhom = [x.strip() for x in v["Nhóm dữ liệu"].split(",") if x.strip()] or None
             try:
-                if v["Vai trò"] in ROLES:
+                if v["Vai trò"] in UNIT_CREATABLE:
                     default_grants(v["Vai trò"], nhom)
             except ValueError as e:
                 loi.append({"dong": i, "cot": "Nhóm dữ liệu", "thong_bao": str(e)})

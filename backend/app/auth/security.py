@@ -26,10 +26,13 @@ def temp_password() -> str:
     return secrets.token_urlsafe(9) + "@1a"
 
 
-def make_token(user_id: int, token_version: int) -> str:
+def make_token(user_id: int, token_version: int, act: int | None = None) -> str:
+    """`act`: quản trị nền tảng đang vào quản trị một xã/phường (phiên đại diện, có thời hạn như phiên thường)."""
     s = get_settings()
     now = datetime.now(UTC)
     payload = {"sub": str(user_id), "tv": token_version, "iat": now, "exp": now + timedelta(minutes=s.JWT_TTL_MINUTES)}
+    if act is not None:
+        payload["act"] = act
     return jwt.encode(payload, s.JWT_SECRET, algorithm="HS256")
 
 

@@ -5,6 +5,7 @@ from decimal import Decimal
 
 from app.budget.models import BudgetLine
 from app.core.periods import parse_ky
+from seeds.sample import ho_so
 
 TY = Decimal(1_000_000_000)
 # lịch tiến độ thu lũy kế được duyệt (không chia đều theo tháng)
@@ -24,12 +25,15 @@ def _d(x: float) -> Decimal:
 
 
 async def seed(s, tenant_id: int, users: dict) -> None:  # noqa: ANN001
+    P = ho_so.P
     for m in range(1, 11):
         ky = f"2026-{m:02d}"
         end = parse_ky(ky).ket_thuc
         chot = datetime(end.year, end.month, end.day, tzinfo=UTC) + timedelta(days=4)
         dsoat = "cho_doi_soat" if m == 10 else "da_doi_soat"
         for nhom, (db, nsp, f) in THU.items():
+            f = P.he_so_thu.get(nhom, f)
+            db, nsp = db * P.he_so_du_toan, nsp * P.he_so_du_toan
             for scope, dt in (("dia_ban", db), ("ns_phuong", nsp)):
                 kh = dt * LICH[m - 1]
                 th = kh * f
@@ -41,6 +45,8 @@ async def seed(s, tenant_id: int, users: dict) -> None:  # noqa: ANN001
                                      thuc_hien=_d(th * 1.034), nguon_loai="api", trang_thai_doi_soat="cho_doi_soat",
                                      ngay_chot=chot, is_sample=True))
         for (nhom, nv), (dt, f10) in CHI.items():
+            dt = dt * P.he_so_du_toan
+            f10 = min(f10, 0.95) if P.muoi else f10
             s.add(BudgetLine(tenant_id=tenant_id, nam=2026, ky=ky, loai="chi", nhom_ma=nhom, nhiem_vu=nv, scope="ns_phuong",
                              du_toan=_d(dt), thuc_hien=_d(dt * f10 * m / 10), nguon_loai="bao_cao_chot",
                              trang_thai_doi_soat=dsoat, ngay_chot=chot, is_sample=True))

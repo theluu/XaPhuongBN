@@ -21,6 +21,7 @@ class User(Base):
     pham_vi_khai_thac: Mapped[str] = mapped_column(String(500), default="")
     password_hash: Mapped[str | None] = mapped_column(String(300), nullable=True)
     totp_secret: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    totp_last: Mapped[int | None] = mapped_column(Integer, nullable=True)  # bước thời gian của mã OTP đã dùng gần nhất
     failed_count: Mapped[int] = mapped_column(Integer, default=0)
     locked_until: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     token_version: Mapped[int] = mapped_column(Integer, default=0)

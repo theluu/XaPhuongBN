@@ -1,7 +1,7 @@
 import * as Tabs from "@radix-ui/react-tabs";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { api, ApiError, getToken } from "@/lib/api";
 import { formatDate, formatNumber, formatPeriod } from "@/lib/format";
 import { PageHeader } from "@/components/PageHeader";
@@ -146,11 +146,13 @@ function DynamicForm({ loai, defaults }: { loai: string; defaults: Record<string
 
 interface Report { tong: number; dung_han: number; cham: number; thieu: number; chua_den_han: number; dung_han_pct: number | null; cham_pct: number | null; thieu_pct: number | null;
   theo_don_vi: { don_vi: string; dung_han: number; cham: number; thieu: number; dung_han_pct: number | null }[];
-  chi_tiet: { ma: string; ten: string; ky: string; han: string; ngay_nop: string | null; ket_qua: string; don_vi: string }[] }
+  theo_dau_moi?: { ma: string; ten: string; dung_han: number; cham: number; thieu: number; dung_han_pct: number | null }[];
+  chi_tiet: { ma: string; ten: string; ky: string; han: string; ngay_nop: string | null; ket_qua: string; don_vi: string; dau_moi?: { ma: string; ten: string }[] }[] }
+type DM = { ma: string; ten: string };
 
 function Compliance() {
   const r = useQuery({ queryKey: ["compliance"], queryFn: () => api<Report>("/api/compliance") });
-  const rem = useQuery({ queryKey: ["reminders"], queryFn: () => api<{ ma: string; ten: string; ky: string; han: string; con_lai_ngay: number; muc: string }[]>("/api/reminders") });
+  const rem = useQuery({ queryKey: ["reminders"], queryFn: () => api<{ ma: string; ten: string; ky: string; han: string; con_lai_ngay: number; muc: string; dau_moi?: DM[]; cua_dau_moi_toi?: boolean }[]>("/api/reminders") });
   const d = r.data;
   return (
     <div className="grid gap-4 xl:grid-cols-[1fr_1.3fr]">
@@ -158,7 +160,8 @@ function Compliance() {
         <h3 className="mb-2 font-semibold">Việc nộp số của tôi</h3>
         <ul className="divide-y divide-[var(--vien)] text-[14px]">
           {(rem.data ?? []).map((x) => (
-            <li key={x.ma + x.ky} className="flex justify-between gap-3 py-2"><span>{x.ten} ({formatPeriod(x.ky)})</span>
+            <li key={x.ma + x.ky} className="flex justify-between gap-3 py-2"><span>{x.ten} ({formatPeriod(x.ky)})
+              {!!x.dau_moi?.length && <span className="block text-[12.5px] text-muc-nhat">Đầu mối: {x.dau_moi.map((m) => m.ten).join(", ")}{x.cua_dau_moi_toi && <b className="text-chinh"> · của bạn</b>}</span>}</span>
               <span className={x.muc === "qua_han" ? "font-medium text-son" : ""}>{x.muc === "qua_han" ? `Quá hạn ${-x.con_lai_ngay} ngày` : `Hạn ${formatDate(x.han)}`}</span></li>
           ))}
           {rem.data?.length === 0 && <li className="py-2 text-muc-nhat">Không có số liệu sắp đến hạn.</li>}
@@ -173,6 +176,12 @@ function Compliance() {
               <thead><tr className="border-b border-vien text-left text-muc-nhat"><th className="py-1 font-medium">Đơn vị</th><th className="text-right font-medium">Đúng hạn</th><th className="text-right font-medium">Chậm</th><th className="text-right font-medium">Thiếu</th></tr></thead>
               <tbody>{d.theo_don_vi.map((x) => <tr key={x.don_vi} className="border-b border-vien"><td className="py-1">{x.don_vi}</td><td className="text-right tabular">{x.dung_han}</td><td className="text-right tabular">{x.cham}</td><td className="text-right tabular text-son">{x.thieu}</td></tr>)}</tbody>
             </table>
+            {!!d.theo_dau_moi?.length && (
+              <table aria-label="Nộp số theo đầu mối" className="mt-4 w-full text-[14px]">
+                <thead><tr className="border-b border-vien text-left text-muc-nhat"><th className="py-1 font-medium">Đầu mối cung cấp (mục V.1)</th><th className="text-right font-medium">Đúng hạn</th><th className="text-right font-medium">Chậm</th><th className="text-right font-medium">Thiếu</th></tr></thead>
+                <tbody>{d.theo_dau_moi.map((x) => <tr key={x.ma} className="border-b border-vien"><td className="py-1"><Link className="lien-ket" to={`/co-cau-to-chuc?tab=dau-moi#dm-${x.ma}`}>{x.ten}</Link></td><td className="text-right tabular">{x.dung_han}</td><td className="text-right tabular">{x.cham}</td><td className="text-right tabular text-son">{x.thieu}</td></tr>)}</tbody>
+              </table>
+            )}
           </>
         )}
       </section>

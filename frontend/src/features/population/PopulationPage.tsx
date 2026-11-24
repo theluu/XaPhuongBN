@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { NguonTrachNhiem } from "@/features/org/DauMoi";
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { api } from "@/lib/api";
 import { formatNumber, formatPeriod } from "@/lib/format";
@@ -25,6 +26,7 @@ export function PopulationPage() {
     <>
       <PageHeader title="Dân cư, an sinh và cơ cấu dân số"
         desc={`Số liệu thống kê tổng hợp kỳ ${formatPeriod(ky)} từ Kho dữ liệu dùng chung. Hệ thống không hiển thị danh sách hay thông tin định danh cá nhân; ô có dưới ${d?.nguong_an ?? 5} người được ẩn.`} />
+      <div className="mb-4"><NguonTrachNhiem nhom="dan_cu" /></div>
       {!d ? <p className="text-muc-nhat">Đang tải…</p> : (
         <div className="space-y-4">
           <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">

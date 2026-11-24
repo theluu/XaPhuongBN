@@ -168,12 +168,26 @@ REQUIRED = {"nguon": "nguồn", "don_vi_cung_cap": "đơn vị cung cấp", "tho
 
 
 def _dec(v: object) -> Decimal | None:
-    if v is None or (isinstance(v, str) and not v.strip()):
-        return None
+    from app.core.formatting import parse_vn_number
+
     try:
-        return Decimal(str(v))
-    except InvalidOperation as e:
-        raise HTTPException(422, f"Giá trị không phải số: {v}") from e
+        return parse_vn_number(v)
+    except ValueError as e:
+        raise HTTPException(422, f"Giá trị không phải số hợp lệ: {v}") from e
+
+
+KY_TEN = {"nam": ("năm", "2026"), "quy": ("quý", "2026-Q3"), "thang": ("tháng", "2026-10"), "tuan": ("tuần", "2026-W40")}
+NGUON_NGUOI_DUNG = {"phuong", "chuyen_nganh"}  # "api" chỉ do connector ghi
+
+
+def check_period(ind: Indicator, ky: str) -> str:
+    """Kỳ báo cáo phải đúng chu kỳ cập nhật của chỉ tiêu (tránh số bị 'mất' vì nhập sai loại kỳ)."""
+    p = parse_ky(ky)
+    loai = KY_LOAI.get(ind.ky_cap_nhat, "thang")
+    if p.loai != loai:
+        ten, mau = KY_TEN[loai]
+        raise HTTPException(422, f"Chỉ tiêu cập nhật theo {ten}, kỳ báo cáo phải dạng {mau}")
+    return str(p)
 
 
 async def create_value(s: AsyncSession, user: CurrentUser, indicator_id: int, data: dict) -> IndicatorValue:
@@ -183,13 +197,15 @@ async def create_value(s: AsyncSession, user: CurrentUser, indicator_id: int, da
     ind = await s.get(Indicator, indicator_id)
     if ind is None:
         raise HTTPException(404, "Không tìm thấy chỉ tiêu")
-    ky = str(parse_ky(data["ky_bao_cao"]))
+    ky = check_period(ind, data["ky_bao_cao"])
     chot = data["thoi_diem_chot"]
     if isinstance(chot, str):
         chot = datetime.fromisoformat(chot.replace("Z", "+00:00"))
     elif isinstance(chot, date) and not isinstance(chot, datetime):
         chot = datetime(chot.year, chot.month, chot.day, tzinfo=UTC)
-    nguon_loai = data.get("nguon_loai", "phuong")
+    nguon_loai = data.get("nguon_loai") or "phuong"
+    if nguon_loai not in NGUON_NGUOI_DUNG:
+        raise HTTPException(422, "Loại nguồn chỉ nhận: phuong hoặc chuyen_nganh")
     last = (await s.execute(
         select(IndicatorValue.version).where(
             IndicatorValue.indicator_id == indicator_id, IndicatorValue.ky_bao_cao == ky,

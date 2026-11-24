@@ -7,91 +7,48 @@ import { useAuth } from "@/lib/auth";
 import { formatDate, formatNumber } from "@/lib/format";
 import { PageHeader } from "@/components/PageHeader";
 import { OnboardWizard } from "./OnboardWizard";
+import { UsersAdmin } from "./UsersAdmin";
+import { RoleMatrix } from "./RoleMatrix";
+import { CatalogAdmin } from "./CatalogAdmin";
+import { TenantPanel, TT_DV, type TenantRow } from "./TenantManager";
 
-const ROLE: Record<string, string> = { quan_tri_don_vi: "Quản trị đơn vị", lanh_dao: "Lãnh đạo", xac_nhan: "Cán bộ xác nhận", nhap_lieu: "Cán bộ nhập liệu",
-  chuyen_nganh: "Cơ quan chuyên ngành", nguoi_xem: "Người xem" };
-const NHOM = ["ktxh", "dan_cu", "ngan_sach", "dau_tu_cong", "cong_trinh", "tthc_pakn", "gd_yt_mt"];
 const errText = (e: unknown) => (e instanceof ApiError ? (typeof e.detail === "string" ? e.detail : "Dữ liệu chưa hợp lệ") : "Có lỗi, thử lại");
 const TAB = "-mb-px border-b-2 border-transparent px-3 py-2 text-[14.5px] text-muc-nhat data-[state=active]:border-muc data-[state=active]:font-semibold data-[state=active]:text-muc";
 
 function PlatformAdmin() {
   const [wizard, setWizard] = useState(false);
+  const [sel, setSel] = useState<number | null>(null);
   const qc = useQueryClient();
-  const t = useQuery({ queryKey: ["platform-tenants"], queryFn: () => api<{ id: number; ma_dvhc: string; ten: string; cap: string; trang_thai: string; so_nguoi_dung: number; so_chi_tieu: number }[]>("/api/platform/tenants") });
+  const t = useQuery({ queryKey: ["platform-tenants"], queryFn: () => api<TenantRow[]>("/api/platform/tenants") });
+  const units = (t.data ?? []).filter((x) => x.cap === "xa" || x.cap === "phuong");
+  const parents = (t.data ?? []).filter((x) => x.cap === "tinh");
+  const ten = (id: number | null) => parents.find((p) => p.id === id)?.ten ?? "—";
   return (
     <>
-      <PageHeader title="Quản trị nền tảng" desc="Các xã/phường dùng chung một nền tảng; dữ liệu mỗi đơn vị được cách ly. Tài khoản quản trị nền tảng không đọc được dữ liệu nghiệp vụ nhạy cảm.">
+      <PageHeader title="Quản trị nền tảng" desc="Các xã/phường dùng chung một nền tảng; dữ liệu mỗi đơn vị được cách ly. Từ đây: khởi tạo, sửa, tạm dừng, xóa xã/phường; quản lý tài khoản từng đơn vị; nạp/xóa dữ liệu minh họa; “Vào quản trị nội dung” để chỉnh sửa toàn bộ dữ liệu của đơn vị. Mọi thao tác ghi nhật ký.">
         {!wizard && <button type="button" className="btn-chinh" onClick={() => setWizard(true)}>Khởi tạo đơn vị mới</button>}
       </PageHeader>
       {wizard && <div className="mb-4"><OnboardWizard onDone={() => { setWizard(false); qc.invalidateQueries({ queryKey: ["platform-tenants"] }); }} /></div>}
-      <div className="khu overflow-x-auto rounded-md">
+      <div className="khu mb-4 overflow-x-auto rounded-md">
         <table className="w-full text-[14.5px]" aria-label="Đơn vị trên nền tảng">
-          <thead><tr className="border-b border-vien text-left text-muc-nhat"><th className="px-4 py-2 font-medium">Đơn vị</th><th className="font-medium">Mã</th><th className="font-medium">Cấp</th>
-            <th className="text-right font-medium">Người dùng</th><th className="px-4 text-right font-medium">Chỉ tiêu</th></tr></thead>
-          <tbody>{(t.data ?? []).map((x) => (
-            <tr key={x.id} className="border-b border-vien"><td className="px-4 py-2">{x.ten}</td><td className="tabular">{x.ma_dvhc}</td><td>{x.cap}</td>
-              <td className="text-right tabular">{x.so_nguoi_dung}</td><td className="px-4 text-right tabular">{x.so_chi_tieu}</td></tr>
-          ))}</tbody>
+          <thead><tr className="border-b border-vien text-left text-muc-nhat"><th className="px-4 py-2 font-medium">Đơn vị</th><th className="font-medium">Mã</th><th className="font-medium">Thuộc</th>
+            <th className="font-medium">Trạng thái</th><th className="text-right font-medium">Tài khoản</th><th className="text-right font-medium">Chỉ tiêu</th><th className="px-4" /></tr></thead>
+          <tbody>{units.map((x) => {
+            const [tt, cls] = TT_DV[x.trang_thai] ?? [x.trang_thai, ""];
+            return (
+              <tr key={x.id} className={`border-b border-vien ${sel === x.id ? "bg-be-mat-2" : ""}`}>
+                <td className="px-4 py-2">{x.ten}</td><td className="tabular">{x.ma_dvhc}</td><td>{ten(x.parent_id)}</td>
+                <td><span className={`nhan-tt ${cls}`}>{tt}</span></td>
+                <td className="text-right tabular">{x.so_nguoi_dung}</td><td className="text-right tabular">{x.so_chi_tieu}</td>
+                <td className="px-4 text-right"><button type="button" className="btn-phu py-1" aria-label={`Quản trị ${x.ten}`} onClick={() => setSel(sel === x.id ? null : x.id)}>{sel === x.id ? "Thu gọn" : "Quản trị"}</button></td>
+              </tr>
+            );
+          })}
+          {t.data && units.length === 0 && <tr><td colSpan={7} className="px-4 py-4 text-center text-muc-nhat">Chưa có xã/phường nào. Bấm “Khởi tạo đơn vị mới”.</td></tr>}</tbody>
         </table>
       </div>
+      {sel !== null && <TenantPanel key={sel} tid={sel} parents={parents} onClose={() => { setSel(null); qc.invalidateQueries({ queryKey: ["platform-tenants"] }); }} />}
     </>
-  );
-}
-
-interface UserRow { id: number; username: string; ho_ten: string; chuc_danh: string; don_vi: string; trang_thai: string; roles: string[]; nhom: string[]; co_2fa: boolean }
-
-function Users() {
-  const qc = useQueryClient();
-  const q = useQuery({ queryKey: ["admin-users"], queryFn: () => api<UserRow[]>("/api/admin/users") });
-  const [f, setF] = useState({ username: "", ho_ten: "", chuc_danh: "", don_vi: "", role: "nhap_lieu", nhom: [] as string[] });
-  const [shown, setShown] = useState<string | null>(null);
-  const [err, setErr] = useState<string | null>(null);
-  const refresh = () => qc.invalidateQueries({ queryKey: ["admin-users"] });
-  const create = useMutation({ mutationFn: () => api<{ mat_khau_tam: string; username: string }>("/api/admin/users", { method: "POST", body: { ...f, nhom: f.nhom.length ? f.nhom : null } }),
-    onSuccess: (r) => { setShown(`Tài khoản ${r.username}: mật khẩu tạm ${r.mat_khau_tam} (chỉ hiển thị một lần)`); setErr(null); refresh(); }, onError: (e) => setErr(errText(e)) });
-  const totp = useMutation({ mutationFn: (id: number) => api<{ secret: string }>(`/api/admin/users/${id}/totp`, { method: "POST" }),
-    onSuccess: (r) => { setShown(`Mã khóa xác thực 2 lớp: ${r.secret}. Nhập mã này vào ứng dụng xác thực (chỉ hiển thị một lần).`); refresh(); } });
-  const revoke = useMutation({ mutationFn: ({ id, ly_do }: { id: number; ly_do: string }) => api(`/api/users/${id}/revoke`, { method: "POST", body: { ly_do } }), onSuccess: refresh });
-  const needNhom = ["xac_nhan", "nhap_lieu", "chuyen_nganh"].includes(f.role);
-  return (
-    <div className="space-y-4">
-      {shown && <p role="status" className="rounded border border-[var(--tam-thoi)] bg-be-mat px-3 py-2 font-medium">{shown}</p>}
-      <div className="khu overflow-x-auto rounded-md">
-        <table aria-label="Người dùng" className="w-full text-[14px]">
-          <thead><tr className="border-b border-vien text-left text-muc-nhat"><th className="px-4 py-2 font-medium">Người dùng</th><th className="font-medium">Vai trò</th><th className="font-medium">Nhóm dữ liệu</th>
-            <th className="font-medium">2 lớp</th><th className="font-medium">Trạng thái</th><th className="px-4 font-medium" /></tr></thead>
-          <tbody>{(q.data ?? []).map((u) => (
-            <tr key={u.id} className="border-b border-vien">
-              <td className="px-4 py-2"><div className="font-medium">{u.ho_ten}</div><div className="text-[12.5px] text-muc-nhat">{u.username}, {u.chuc_danh}</div></td>
-              <td>{u.roles.map((r) => ROLE[r] ?? r).join(", ")}</td><td className="text-[13px]">{u.nhom.includes("*") ? "Tất cả" : u.nhom.join(", ")}</td>
-              <td>{u.co_2fa ? "Đã bật" : "Chưa"}</td><td>{u.trang_thai === "hoat_dong" ? "Hoạt động" : u.trang_thai === "thu_hoi" ? "Đã thu hồi" : "Chờ duyệt"}</td>
-              <td className="space-x-2 whitespace-nowrap px-4 text-right">
-                <button type="button" className="btn-phu py-1" onClick={() => totp.mutate(u.id)}>Cấp mã 2 lớp</button>
-                {u.trang_thai === "hoat_dong" && <button type="button" className="btn-phu py-1 text-son" onClick={() => { const ly_do = window.prompt("Lý do thu hồi quyền"); if (ly_do?.trim()) revoke.mutate({ id: u.id, ly_do }); }}>Thu hồi quyền</button>}
-              </td>
-            </tr>
-          ))}</tbody>
-        </table>
-      </div>
-      <form className="khu rounded-md p-4" onSubmit={(e) => { e.preventDefault(); create.mutate(); }}>
-        <h3 className="mb-2 font-semibold">Tạo tài khoản</h3>
-        <div className="grid gap-3 sm:grid-cols-3">
-          {(["username", "ho_ten", "chuc_danh", "don_vi"] as const).map((k) => (
-            <label key={k} className="text-sm font-medium">{{ username: "Tên đăng nhập", ho_ten: "Họ tên", chuc_danh: "Chức danh", don_vi: "Đơn vị công tác" }[k]}
-              <input className="o-nhap mt-1" value={f[k]} onChange={(e) => setF({ ...f, [k]: e.target.value })} /></label>
-          ))}
-          <label className="text-sm font-medium">Vai trò<select className="o-nhap mt-1" value={f.role} onChange={(e) => setF({ ...f, role: e.target.value })}>
-            {Object.entries(ROLE).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select></label>
-        </div>
-        {needNhom && (
-          <fieldset className="mt-3 flex flex-wrap gap-3 text-[14px]"><legend className="mb-1 text-sm font-medium">Nhóm dữ liệu được giao</legend>
-            {NHOM.map((n) => <label key={n} className="flex items-center gap-1.5"><input type="checkbox" checked={f.nhom.includes(n)} onChange={(e) => setF({ ...f, nhom: e.target.checked ? [...f.nhom, n] : f.nhom.filter((x) => x !== n) })} />{n}</label>)}
-          </fieldset>
-        )}
-        {err && <p role="alert" className="mt-2 text-sm text-son">{err}</p>}
-        <button type="submit" className="btn-chinh mt-3" disabled={!f.username || !f.ho_ten || (needNhom && !f.nhom.length) || create.isPending}>Tạo tài khoản</button>
-      </form>
-    </div>
   );
 }
 
@@ -134,6 +91,7 @@ function Settings() {
   const [msg, setMsg] = useState<string | null>(null);
   const [l1, setL1] = useState(tenant?.ten_co_quan[0] ?? "");
   const [l2, setL2] = useState(tenant?.ten_co_quan[1] ?? "");
+  const [tile, setTile] = useState(tenant?.ban_do?.tile_url ?? "");
   const purge = useMutation({ mutationFn: () => api<{ da_xoa: number }>("/api/admin/purge-sample", { method: "POST", body: { xac_nhan: phrase } }),
     onSuccess: (r) => { setMsg(`Đã xóa ${formatNumber(r.da_xoa)} bản ghi minh họa.`); qc.invalidateQueries(); }, onError: (e) => setMsg(errText(e)) });
   const save = useMutation({ mutationFn: (body: Record<string, unknown>) => api("/api/admin/tenant", { method: "PATCH", body }), onSuccess: () => { setMsg("Đã lưu cấu hình."); qc.invalidateQueries({ queryKey: ["tenant"] }); }, onError: (e) => setMsg(errText(e)) });
@@ -159,7 +117,13 @@ function Settings() {
         <button type="button" className="btn-phu mt-2" onClick={() => save.mutate({ ten_co_quan: [l1, l2] })}>Lưu tên cơ quan</button>
         <label className="mt-4 block text-sm font-medium">Biểu trưng của đơn vị (ảnh PNG/JPG). Không có biểu trưng thì hệ thống dùng Quốc huy.
           <input type="file" accept="image/png,image/jpeg,image/webp" className="mt-1 block text-sm" onChange={(e) => e.target.files?.[0] && uploadLogo(e.target.files[0])} /></label>
+        <h3 className="mb-1 mt-5 font-semibold">Nền bản đồ</h3>
+        <p className="text-[13.5px] text-muc-nhat">Địa chỉ ảnh nền dạng {"{z}/{x}/{y}"}. Mặc định dùng OpenStreetMap France, dự phòng Esri (không cần khóa API). Triển khai mạng nội bộ thì nhập máy chủ bản đồ của tỉnh; để trống để dùng mặc định. Khi lỗi, hệ thống tự chuyển nguồn dự phòng.</p>
+        <label className="mt-2 block text-sm font-medium">Địa chỉ nền bản đồ<input className="o-nhap mt-1 font-mono text-[13px]" value={tile} placeholder="https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png" onChange={(e) => setTile(e.target.value)} /></label>
+        <button type="button" className="btn-phu mt-2" onClick={() => save.mutate({ tile_url: tile.trim() })}>Lưu nền bản đồ</button>
       </section>
+      <QuickLinks onMsg={setMsg} />
+      <FeedSources onMsg={setMsg} />
       <section className="khu rounded-md p-4">
         <h3 className="mb-2 font-semibold">Dữ liệu của đơn vị</h3>
         <p className="text-[14px] text-muc-nhat">Tải toàn bộ dữ liệu của đơn vị (không gồm mật khẩu, khóa 2 lớp). Đơn vị không bị khóa vào nền tảng.</p>
@@ -173,17 +137,86 @@ function Settings() {
   );
 }
 
+function QuickLinks({ onMsg }: { onMsg: (m: string) => void }) {
+  const qc = useQueryClient();
+  const bt = useQuery({ queryKey: ["bang-tin"], queryFn: () => api<{ lien_ket: { ten: string; url: string }[] }>("/api/bang-tin") });
+  const [rows, setRows] = useState<{ ten: string; url: string }[] | null>(null);
+  const cur = rows ?? bt.data?.lien_ket ?? [];
+  const save = useMutation({ mutationFn: () => api("/api/admin/tenant", { method: "PATCH", body: { lien_ket: cur.filter((r) => r.ten.trim() || r.url.trim()) } }),
+    onSuccess: () => { onMsg("Đã lưu liên kết nhanh."); setRows(null); qc.invalidateQueries({ queryKey: ["bang-tin"] }); }, onError: (e) => onMsg(errText(e)) });
+  const set = (i: number, k: "ten" | "url", v: string) => setRows(cur.map((r, j) => (j === i ? { ...r, [k]: v } : r)));
+  return (
+    <section className="khu rounded-md p-4 lg:col-span-2" aria-labelledby="lien-ket-nhanh">
+      <h3 id="lien-ket-nhanh" className="mb-1 font-semibold">Liên kết nhanh trên dải bản tin</h3>
+      <p className="text-[13.5px] text-muc-nhat">Cổng TTĐT của phường, thành phố, Dịch vụ công, tra cứu hồ sơ… Địa chỉ phải bắt đầu bằng https:// (hoặc / cho trang trong hệ thống). Tối đa 12 liên kết.</p>
+      <div className="mt-2 space-y-2">{cur.map((r, i) => (
+        <div key={i} className="flex flex-wrap gap-2">
+          <input aria-label={`Tên liên kết ${i + 1}`} className="o-nhap w-56" value={r.ten} onChange={(e) => set(i, "ten", e.target.value)} />
+          <input aria-label={`Địa chỉ liên kết ${i + 1}`} className="o-nhap min-w-[260px] flex-1 font-mono text-[13px]" value={r.url} onChange={(e) => set(i, "url", e.target.value)} />
+          <button type="button" className="lien-ket text-[13px] text-son" onClick={() => setRows(cur.filter((_, j) => j !== i))}>Bỏ</button>
+        </div>
+      ))}</div>
+      <div className="mt-2 flex gap-2">
+        {cur.length < 12 && <button type="button" className="btn-phu py-1.5" onClick={() => setRows([...cur, { ten: "", url: "https://" }])}>Thêm liên kết</button>}
+        <button type="button" className="btn-chinh py-1.5" disabled={save.isPending || rows === null} onClick={() => save.mutate()}>Lưu liên kết</button>
+      </div>
+    </section>
+  );
+}
+
+interface FeedStatus { ok: boolean; luc: string; so_tin: number; loi: string }
+function FeedSources({ onMsg }: { onMsg: (m: string) => void }) {
+  const qc = useQueryClient();
+  const q = useQuery({ queryKey: ["nguon-tin"], queryFn: () => api<{ nguon_tin: { ten: string; url: string }[]; trang_thai: Record<string, FeedStatus> }>("/api/admin/nguon-tin") });
+  const [rows, setRows] = useState<{ ten: string; url: string }[] | null>(null);
+  const cur = rows ?? q.data?.nguon_tin ?? [];
+  const st = q.data?.trang_thai ?? {};
+  const save = useMutation({ mutationFn: () => api("/api/admin/tenant", { method: "PATCH", body: { nguon_tin: cur.filter((r) => r.ten.trim() || r.url.trim()) } }),
+    onSuccess: () => { onMsg("Đã lưu nguồn tin. Bấm “Lấy tin ngay” để kiểm tra."); setRows(null); qc.invalidateQueries({ queryKey: ["nguon-tin"] }); }, onError: (e) => onMsg(errText(e)) });
+  const pull = useMutation({ mutationFn: () => api<{ trang_thai: Record<string, FeedStatus> }>("/api/admin/nguon-tin/lam-moi", { method: "POST" }),
+    onSuccess: (r) => { const v = Object.values(r.trang_thai); onMsg(`Đã lấy tin: ${v.filter((x) => x.ok).length}/${v.length} nguồn thành công.`);
+      qc.invalidateQueries({ queryKey: ["nguon-tin"] }); qc.invalidateQueries({ queryKey: ["bang-tin"] }); }, onError: (e) => onMsg(errText(e)) });
+  const set = (i: number, k: "ten" | "url", v: string) => setRows(cur.map((r, j) => (j === i ? { ...r, [k]: v } : r)));
+  return (
+    <section className="khu rounded-md p-4 lg:col-span-2" aria-labelledby="nguon-tin">
+      <h3 id="nguon-tin" className="mb-1 font-semibold">Nguồn tin RSS/Atom cho dải bản tin</h3>
+      <p className="text-[13.5px] text-muc-nhat">Địa chỉ nguồn tin (RSS/Atom) của Cổng TTĐT phường, thành phố… do đơn vị quản lý cổng cung cấp. Hệ thống tự lấy tin mỗi 30 phút và hiện tin 7 ngày gần nhất.
+        Hệ thống không đọc trang web thường; nguồn không phải RSS/Atom hoặc chặn truy cập sẽ báo lỗi bên dưới. Tối đa 5 nguồn, chỉ https.</p>
+      <div className="mt-2 space-y-2">{cur.map((r, i) => {
+        const s = st[r.url];
+        return (
+          <div key={i}>
+            <div className="flex flex-wrap gap-2">
+              <input aria-label={`Tên nguồn tin ${i + 1}`} className="o-nhap w-56" value={r.ten} onChange={(e) => set(i, "ten", e.target.value)} />
+              <input aria-label={`Địa chỉ nguồn tin ${i + 1}`} className="o-nhap min-w-[260px] flex-1 font-mono text-[13px]" value={r.url} onChange={(e) => set(i, "url", e.target.value)} />
+              <button type="button" className="lien-ket text-[13px] text-son" onClick={() => setRows(cur.filter((_, j) => j !== i))}>Bỏ</button>
+            </div>
+            {s && <p className={`mt-0.5 text-[12.5px] ${s.ok ? "text-[var(--xac-nhan)]" : "text-son"}`}>{s.ok ? `Lấy được ${s.so_tin} tin` : s.loi} · {new Date(s.luc).toLocaleString("vi-VN")}</p>}
+          </div>
+        );
+      })}</div>
+      <div className="mt-2 flex flex-wrap gap-2">
+        {cur.length < 5 && <button type="button" className="btn-phu py-1.5" onClick={() => setRows([...cur, { ten: "", url: "https://" }])}>Thêm nguồn tin</button>}
+        <button type="button" className="btn-chinh py-1.5" disabled={save.isPending || rows === null} onClick={() => save.mutate()}>Lưu nguồn tin</button>
+        <button type="button" className="btn-phu py-1.5" disabled={pull.isPending || rows !== null || !cur.length} onClick={() => pull.mutate()}>{pull.isPending ? "Đang lấy tin…" : "Lấy tin ngay"}</button>
+      </div>
+    </section>
+  );
+}
+
 function UnitAdmin() {
   const [params, setParams] = useSearchParams();
   const tab = params.get("tab") ?? "nguoi-dung";
   return (
     <>
-      <PageHeader title="Quản trị đơn vị" desc="Tài khoản, quy tắc cảnh báo, nhật ký truy cập và cấu hình đơn vị. Mọi thay đổi đều được ghi nhật ký." />
+      <PageHeader title="Quản trị đơn vị" desc="Tài khoản và phân quyền, danh mục địa bàn – phòng ban – lĩnh vực, quy tắc cảnh báo, nhật ký truy cập và cấu hình đơn vị. Mọi thay đổi đều được ghi nhật ký." />
       <Tabs.Root value={tab} onValueChange={(t) => setParams({ tab: t })}>
         <Tabs.List aria-label="Quản trị" className="mb-4 flex flex-wrap gap-1 border-b border-vien">
-          {[["nguoi-dung", "Người dùng"], ["quy-tac", "Quy tắc cảnh báo"], ["nhat-ky", "Nhật ký truy cập"], ["cau-hinh", "Cấu hình đơn vị"]].map(([k, t]) => <Tabs.Trigger key={k} value={k} className={TAB}>{t}</Tabs.Trigger>)}
+          {[["nguoi-dung", "Người dùng"], ["phan-quyen", "Phân quyền"], ["danh-muc", "Danh mục"], ["quy-tac", "Quy tắc cảnh báo"], ["nhat-ky", "Nhật ký truy cập"], ["cau-hinh", "Cấu hình đơn vị"]].map(([k, t]) => <Tabs.Trigger key={k} value={k} className={TAB}>{t}</Tabs.Trigger>)}
         </Tabs.List>
-        <Tabs.Content value="nguoi-dung"><Users /></Tabs.Content>
+        <Tabs.Content value="nguoi-dung"><UsersAdmin /></Tabs.Content>
+        <Tabs.Content value="phan-quyen"><RoleMatrix /></Tabs.Content>
+        <Tabs.Content value="danh-muc"><CatalogAdmin /></Tabs.Content>
         <Tabs.Content value="quy-tac"><Rules /></Tabs.Content>
         <Tabs.Content value="nhat-ky"><Audit /></Tabs.Content>
         <Tabs.Content value="cau-hinh"><Settings /></Tabs.Content>

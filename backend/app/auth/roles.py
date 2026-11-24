@@ -15,8 +15,13 @@ ROLES = {
     "nhap_lieu": "Cán bộ nhập liệu",
     "chuyen_nganh": "Cơ quan chuyên ngành",
     "nguoi_xem": "Người xem",
+    "man_hinh_tv": "Màn hình TV phòng điều hành",
 }
 ROLES_2FA = {"lanh_dao", "xac_nhan", "quan_tri_nen_tang", "quan_tri_don_vi"}
+# Vai trò quản trị đơn vị được phép tạo (không bao giờ tạo được quản trị nền tảng)
+UNIT_CREATABLE = {"lanh_dao", "xac_nhan", "nhap_lieu", "chuyen_nganh", "nguoi_xem", "man_hinh_tv", "quan_tri_don_vi"}
+# Tài khoản các vai trò này do quản trị tạo phải được lãnh đạo đơn vị phê duyệt (tách nhiệm)
+NEED_LEADER_APPROVAL = {"lanh_dao", "quan_tri_don_vi"}
 ALL = ["doc", "nhap", "duyet"]
 
 
@@ -29,11 +34,16 @@ def default_grants(role: str, nhom: list[str] | None = None) -> list[tuple[list[
     if role == "quan_tri_don_vi":
         return [(["quan_tri"], ALL), (NHOM_CONG_KHAI, ["doc"])]
     if role == "lanh_dao":
-        return [(None, ["doc"]), (["canh_bao"], ALL)]
+        return [(NHOM_NGHIEP_VU, ["doc"]), (["canh_bao"], ALL)]
     if role == "nguoi_xem":
         return [(NHOM_CONG_KHAI, ["doc"])]
+    if role == "man_hinh_tv":  # xem phản ánh, cảnh báo ở dạng tổng hợp; không bao giờ thấy thông tin người gửi
+        return [([*NHOM_CONG_KHAI, "tthc_pakn"], ["doc"])]
     if not nhom:
         raise ValueError("Vai trò này cần chỉ rõ nhóm dữ liệu")
+    bad = [n for n in nhom if n not in NHOM_NGHIEP_VU]
+    if bad:
+        raise ValueError(f"Nhóm dữ liệu không hợp lệ: {', '.join(bad)}")
     if role == "xac_nhan":
         return [(nhom, ["doc", "duyet"])]
     if role == "nhap_lieu":

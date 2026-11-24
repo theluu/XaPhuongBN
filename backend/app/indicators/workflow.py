@@ -2,6 +2,8 @@
 from datetime import UTC, datetime
 
 from fastapi import APIRouter, Depends, HTTPException
+from typing import Literal
+
 from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -27,7 +29,7 @@ class ValueIn(BaseModel):
     nguon: str = ""
     don_vi_cung_cap: str = ""
     thoi_diem_chot: str = ""
-    nguon_loai: str = "phuong"
+    nguon_loai: Literal["phuong", "chuyen_nganh"] = "phuong"
     scope: str | None = None
     ly_do: str | None = None
     minh_chung_keys: list[str] = []
@@ -58,8 +60,11 @@ async def submit(ma: str, body: ValueIn, s: AsyncSession = Depends(tenant_db), u
         raise HTTPException(403, "Bạn không có quyền nhập số liệu nhóm này")
     if not await keys_exist(s, body.minh_chung_keys):
         raise HTTPException(422, "Tệp minh chứng không tồn tại")
+    from app.indicators.service import check_period
+
+    ky = check_period(ind, body.ky_bao_cao)
     has_confirmed = (await s.execute(select(IndicatorValue.id).where(
-        IndicatorValue.indicator_id == ind.id, IndicatorValue.ky_bao_cao == body.ky_bao_cao,
+        IndicatorValue.indicator_id == ind.id, IndicatorValue.ky_bao_cao == ky,
         IndicatorValue.nguon_loai == body.nguon_loai, IndicatorValue.trang_thai == "da_xac_nhan",
     ))).first()
     if has_confirmed and not (body.ly_do or "").strip():
@@ -67,6 +72,12 @@ async def submit(ma: str, body: ValueIn, s: AsyncSession = Depends(tenant_db), u
     v = await create_value(s, user, ind.id, body.model_dump())
     await s.commit()
     await record_change(user, s.info["tenant_id"], f"so_lieu:{v.id}:nhap", None, value_out(v) | {"thoi_diem_chot": str(v.thoi_diem_chot)})
+    from app.noti.service import notify, users_with
+
+    tid = s.info["tenant_id"]
+    await notify(s, tid, await users_with(tid, duyet=ind.nhom), "cho_xac_nhan", f"Số liệu chờ xác nhận: {ind.ten}",
+                 f"Kỳ {ky}: {body.gia_tri if body.gia_tri is not None else 'chưa có giá trị'} {ind.don_vi_do}", "/nhap-lieu", "thuong",
+                 f"cho_xn:{ind.id}:{ky}", bo_qua=user.id)
     return value_out(v, ind)
 
 
@@ -98,6 +109,10 @@ async def confirm(value_id: int, s: AsyncSession = Depends(tenant_db), user: Cur
     await s.commit()
     await record_change(user, s.info["tenant_id"], f"so_lieu:{v.id}:xac_nhan", {"trang_thai": "tam_thoi"},
                         {"trang_thai": "da_xac_nhan", "gia_tri": num(v.gia_tri), "nguoi_xac_nhan": v.nguoi_xac_nhan_ten})
+    from app.noti.service import mark_read_key
+
+    await mark_read_key(s, user.id, f"cho_xn:{ind.id}:{v.ky_bao_cao}")
+    await s.commit()
     from app.events import emit
 
     await emit("value_confirmed", tenant_id=s.info["tenant_id"], indicator_id=ind.id)
@@ -119,6 +134,12 @@ async def reject(value_id: int, body: RejectIn, s: AsyncSession = Depends(tenant
     await s.commit()
     await record_change(user, s.info["tenant_id"], f"so_lieu:{v.id}:tu_choi", {"trang_thai": "tam_thoi"},
                         {"trang_thai": "tu_choi", "ly_do": v.ly_do})
+    from app.noti.service import mark_read_key, notify
+
+    await notify(s, s.info["tenant_id"], [v.nguoi_nhap_id or 0], "tu_choi", f"Số liệu bị từ chối: {ind.ten} kỳ {v.ky_bao_cao}", f"Lý do: {v.ly_do}",
+                 f"/nhap-lieu?tab=bieu-mau&ma={ind.ma_chi_tieu}&ky={v.ky_bao_cao}", "quan_trong", bo_qua=user.id)
+    await mark_read_key(s, user.id, f"cho_xn:{ind.id}:{v.ky_bao_cao}")
+    await s.commit()
     return value_out(v, ind)
 
 

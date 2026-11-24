@@ -19,6 +19,14 @@ def _app_password() -> str:
 
 async def ensure_app_role(conn: AsyncConnection) -> None:
     exists = (await conn.execute(text("SELECT 1 FROM pg_roles WHERE rolname=:r"), {"r": APP_ROLE})).scalar()
+    if os.environ.get("APP_ROLE_EXTERNAL") == "1":
+        # Máy chủ CSDL dùng chung: vai trò ioc_app do quản trị CSDL tạo sẵn; chủ sở hữu không cần quyền CREATEROLE
+        if not exists:
+            raise RuntimeError(f"Chưa có vai trò {APP_ROLE}; quản trị CSDL cần tạo trước (LOGIN NOSUPERUSER NOBYPASSRLS)")
+        bad = (await conn.execute(text("SELECT rolsuper OR rolbypassrls FROM pg_roles WHERE rolname=:r"), {"r": APP_ROLE})).scalar()
+        if bad:
+            raise RuntimeError(f"Vai trò {APP_ROLE} không được là superuser hoặc BYPASSRLS")
+        return
     pw = _app_password().replace("'", "''")
     if not exists:
         await conn.execute(text(f"CREATE ROLE {APP_ROLE} LOGIN NOSUPERUSER NOBYPASSRLS PASSWORD '{pw}'"))

@@ -8,3 +8,6 @@ dist/
 .pytest_cache/
 .DS_Store
 .playwright-mcp/
+
+# Tài liệu, video, tài khoản demo gửi khách — chứa mật khẩu, không commit
+demo-khach-hang/

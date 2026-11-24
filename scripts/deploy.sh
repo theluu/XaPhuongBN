@@ -26,5 +26,6 @@ echo
 docker compose "${FILES[@]}" exec -T backend python -m seeds.run platform
 if [[ "$ENV" != live ]]; then
   docker compose "${FILES[@]}" exec -T backend python -m seeds.run tenant viet_yen --with-sample
+  docker compose "${FILES[@]}" exec -T backend python -m seeds.run tenant nenh --with-sample
 fi
 echo "==> Xong: http://localhost:6680"

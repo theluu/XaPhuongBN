@@ -91,6 +91,10 @@ async def assign(aid: int, body: AssignIn, s: AsyncSession = Depends(tenant_db),
     await s.commit()
     await s.refresh(c)
     await record_change(user, a.tenant_id, f"canh_bao:{aid}:giao", None, jsonable(body.model_dump()))
+    from app.noti.service import notify, users_by_name
+
+    await notify(s, a.tenant_id, await users_by_name(a.tenant_id, c.nguoi_phu_trach), "giao_viec", f"Bạn được giao xử lý: {a.tieu_de}",
+                 f"Hạn {c.han.strftime('%d/%m/%Y')}. {c.chi_dao or ''}".strip(), f"/canh-bao?id={aid}", "quan_trong", f"canh_bao_giao:{aid}", bo_qua=user.id)
     return jsonable(alert_out(a, c))
 
 
@@ -128,4 +132,10 @@ async def update_case(cid: int, body: CaseIn, s: AsyncSession = Depends(tenant_d
     await s.commit()
     await s.refresh(c)
     await record_change(user, a.tenant_id, f"ho_so:{cid}", jsonable(before), jsonable(case_out(c)))
+    if body.trang_thai in ("hoan_thanh", "gia_han"):
+        from app.noti.service import notify
+
+        text = "đã hoàn thành" if body.trang_thai == "hoan_thanh" else f"gia hạn đến {c.han.strftime('%d/%m/%Y')}"
+        await notify(s, a.tenant_id, [c.nguoi_giao_id], "ket_qua", f"Nhiệm vụ {text}: {a.tieu_de}", (c.ket_qua or "")[:300],
+                     f"/canh-bao?id={a.id}", "thuong", bo_qua=user.id)
     return jsonable(case_out(c))

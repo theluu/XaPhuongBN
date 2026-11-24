@@ -3,7 +3,7 @@ import { useState } from "react";
 import { api, ApiError } from "@/lib/api";
 
 interface Pack { ma: string; ten: string; phien_ban: number; so_chi_tieu: number }
-interface Result { tenant_id: number; so_chi_tieu: number; so_tdp: number; lanh_dao: string; mat_khau_tam: string }
+interface Result { tenant_id: number; so_chi_tieu: number; so_tdp: number; lanh_dao: string; mat_khau_tam: string; totp_secret?: string | null }
 
 const STEPS = ["Đơn vị hành chính", "Gói mẫu", "Tổ dân phố", "Tài khoản lãnh đạo", "Xác nhận"];
 
@@ -24,9 +24,13 @@ export function OnboardWizard({ onDone }: { onDone: () => void }) {
     return (
       <div className="khu rounded-md p-5" role="status">
         <h3 className="text-lg font-semibold">Đã khởi tạo {f.ten}</h3>
-        <p className="mt-1 text-[14.5px]">{m.data.so_chi_tieu} chỉ tiêu từ gói mẫu, {m.data.so_tdp} tổ dân phố. Các phân hệ hiển thị "Đang kết nối" cho tới khi có nguồn dữ liệu hoặc phường nhập số.</p>
+        <p className="mt-1 text-[14.5px]">{m.data.so_chi_tieu} chỉ tiêu từ gói mẫu, {m.data.so_tdp} {f.cap === "xa" ? "thôn" : "tổ dân phố"}. Các phân hệ hiển thị "Đang kết nối" cho tới khi có nguồn dữ liệu hoặc phường nhập số.</p>
         <p className="mt-3 text-[14.5px]">Tài khoản lãnh đạo: <b>{m.data.lanh_dao}</b>. Mật khẩu tạm (chỉ hiển thị một lần):</p>
         <p className="mt-1 inline-block rounded bg-nen px-3 py-1.5 font-mono text-lg tracking-wide">{m.data.mat_khau_tam}</p>
+        {m.data.totp_secret && <>
+          <p className="mt-3 text-[14.5px]">Mã khóa xác thực 2 lớp (nhập vào ứng dụng Google/Microsoft Authenticator, chỉ hiển thị một lần):</p>
+          <p className="mt-1 inline-block rounded bg-nen px-3 py-1.5 font-mono text-lg tracking-wide">{m.data.totp_secret}</p>
+        </>}
         <p className="mt-2 text-[13px] text-muc-nhat">Người dùng phải đổi mật khẩu ở lần đăng nhập đầu tiên.</p>
         <button type="button" className="btn-phu mt-4" onClick={onDone}>Đóng</button>
       </div>

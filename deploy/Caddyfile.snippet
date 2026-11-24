@@ -5,7 +5,10 @@ dieuhanh.example.gov.vn {
         Strict-Transport-Security "max-age=31536000; includeSubDomains"
         -Server
     }
-    reverse_proxy 127.0.0.1:6680
+    reverse_proxy 127.0.0.1:6680 {
+        # ghi đè bằng địa chỉ thật của người dùng — không chuyển tiếp X-Forwarded-For do trình duyệt tự gửi
+        header_up X-Forwarded-For {remote_host}
+    }
     log {
         output file /var/log/caddy/ioc-xp.log
     }

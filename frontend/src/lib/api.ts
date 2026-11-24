@@ -3,6 +3,14 @@ const KEY = "ioc-xp-token";
 export function getToken(): string | null {
   try { return sessionStorage.getItem(KEY); } catch { return null; }
 }
+const KEY_GOC = "ioc-xp-token-nen-tang";
+/** Phiên quản trị nền tảng được cất lại khi vào quản trị một xã/phường, để quay về. */
+export function getPlatformToken(): string | null {
+  try { return sessionStorage.getItem(KEY_GOC); } catch { return null; }
+}
+export function setPlatformToken(t: string | null): void {
+  try { t ? sessionStorage.setItem(KEY_GOC, t) : sessionStorage.removeItem(KEY_GOC); } catch { /* trình duyệt chặn lưu trữ */ }
+}
 export function setToken(t: string | null): void {
   try { t ? sessionStorage.setItem(KEY, t) : sessionStorage.removeItem(KEY); } catch { /* trình duyệt chặn lưu trữ */ }
 }

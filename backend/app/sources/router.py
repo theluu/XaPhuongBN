@@ -15,8 +15,11 @@ router = APIRouter(prefix="/api", tags=["nguon-du-lieu"])
 
 @router.get("/sources")
 async def list_sources(s: AsyncSession = Depends(tenant_db)) -> list[dict]:
+    from app.dau_moi.service import brief, lookup
+
+    lk = await lookup(s, s.info["tenant_id"])
     rows = (await s.execute(select(DataSource).order_by(DataSource.nhom_du_lieu, DataSource.ma))).scalars()
-    return [source_out(x) for x in rows]
+    return [{**source_out(x), "dau_moi": brief(lk.nguon(x.ma) or lk.nhom(x.nhom_du_lieu, ("cung_cap",)))} for x in rows]
 
 
 @router.get("/modules")

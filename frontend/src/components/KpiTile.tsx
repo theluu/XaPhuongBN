@@ -22,11 +22,11 @@ export function KpiTile({ card, size = "md", onOpen }: { card: IndicatorCard; si
   const xl = size === "xl";
   return (
     <article
-      className="khu relative flex min-h-[148px] flex-col rounded-md border-l-[3px] p-3.5"
-      style={{ borderLeftColor: STATUS_COLOR[card.status] }}
+      className="khu relative flex min-h-[148px] flex-col overflow-hidden p-4"
+      style={{ borderTop: `4px solid ${STATUS_COLOR[card.status]}` }}
     >
       <div className="flex items-start gap-2">
-        <h3 className={`flex-1 font-semibold leading-snug ${xl ? "text-lg" : "text-[15px]"}`}>
+        <h3 className={`flex-1 font-bold leading-snug ${xl ? "text-lg" : "text-[14.5px]"}`}>
           {onOpen ? (
             <button type="button" onClick={onOpen} className="text-left hover:underline">{card.ten}</button>
           ) : card.link ? (
@@ -36,7 +36,7 @@ export function KpiTile({ card, size = "md", onOpen }: { card: IndicatorCard; si
         <ProvenanceStamp card={card} size={xl ? 40 : 30} />
       </div>
       <div className={`mt-2 flex items-baseline gap-1.5 rounded ${missing ? "is-missing px-2 py-1" : ""}`}>
-        <span data-testid="kpi-value" className={`font-so font-semibold tabular leading-none ${xl ? "text-6xl" : "text-[40px]"} ${missing ? "text-thieu" : ""}`}>
+        <span data-testid="kpi-value" className={`font-so font-extrabold tabular leading-none tracking-tight ${xl ? "text-6xl" : "text-[36px] sm:text-[40px]"} ${missing ? "text-thieu" : ""}`}>
           {formatNumber(card.thuc_hien)}
         </span>
         <span className="text-sm text-muc-nhat">{card.don_vi}</span>
